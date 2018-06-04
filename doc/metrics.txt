@@ -1,0 +1,23 @@
+This file describes the metrics that we use to predict the passing target.
+
+Big question: how to reconstruct players' relative locations in the field?
+Proposal: Divide the field into many squares (square size is a super parameter), and sort them by their dangerousness (e.g., distance to the goal line, angle to the goal line). For each square, use 0 to indicate neither teammates or opponents in the square, use 1 to indicate teammates in the square, and use -1 to indicate opponents in the square, and use 2 to indicate both teammates and opponents in the square. Build model or construct rules to predict the target square. 
+
+Response variable:
+  Receiver id
+
+Sender metrics:
+  Sender X coordinate, sender y coordinate
+  Sender X rank, sender y rank
+  Location of closest opponent
+  Location of second-closest opponent
+  
+Candidate receiver metrics:
+
+Opposing team metrics:
+
+Time metrics:
+  Passing start time
+
+
+
