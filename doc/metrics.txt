@@ -7,17 +7,24 @@ Response variable:
   Receiver id
 
 Sender metrics:
-  Sender X coordinate, sender y coordinate
-  Sender X rank, sender y rank
+  Sender X/Y coordinates
+  Sender X/Y rank
   Location of closest opponent
   Location of second-closest opponent
   
 Candidate receiver metrics:
+  Receiver X/Y coordidates
+  Receiver X/Y rank
+  Reciever angle (angle of the sender - receiver path and sender - opponent path)
 
 Opposing team metrics:
 
 Time metrics:
   Passing start time
+
+
+Some thoughts:
+Firstly use some heuristics to filter out unlikely passing targets (e.g., teammates behind a components, or passing back to goalkeeper from the front half)
 
 
 
