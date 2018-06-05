@@ -24,7 +24,9 @@ Time metrics:
 
 
 Some thoughts:
+
 Firstly use some heuristics to filter out unlikely passing targets (e.g., teammates behind a components, or passing back to goalkeeper from the front half)
 
+For each candidate receiver, predict its probability to receive the ball. Metrics: receiver location, relative location to sender, passing angle, surrounding opponents.
 
 
