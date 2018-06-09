@@ -1,0 +1,6 @@
+Performance measures:
+1. Reciprocal rank (RR): RR is the reciprocal rank of the first relevant document
+according to the ranking
+
+2. Top-N accuracy
+
