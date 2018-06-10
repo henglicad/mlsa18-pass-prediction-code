@@ -10,7 +10,8 @@ setwd("/Users/hengli/Projects/mlsa18-pass-prediction/src")
 #######################################################################
 rawData <- read.csv("passingfeatures.tsv", sep = "\t")
 #names(rawData)
-data <- rawData[1:round(nrow(rawData)/10), ] # using a smaller data set for testing and debugging
+#data <- rawData[1:round(nrow(rawData)/10), ] # using a smaller data set for testing and debugging
+data <- rawData
 
 #######################################################################
 ##                           Pre-Modeling                            ##
@@ -35,6 +36,8 @@ folds <- cut(seq(1, numPasses), breaks = 10, labels = FALSE)
 top1AccVec <- c(); top3AccVec <- c(); top5AccVec <- c()
 
 for(i in 1:10) {
+  cat("Fold count ", i, "\n")
+  
   testIdx <- which(folds==i, arr.ind = TRUE)
   testPassId <- shuffledPassId[testIdx]
   trainPassId <- shuffledPassId[-testIdx]
@@ -51,10 +54,17 @@ for(i in 1:10) {
   
   ## calculate top K accuracy
   top1TP <- 0; top3TP <- 0; top5TP <- 0
+  validPassCount <- 0
   for (passId in testPassId) {
     testIdxForPassId <- which(testData$pass_id == passId)
     testDataForPassId <- testData[testIdxForPassId, ]
-    receiverId <- testDataForPassId[testDataForPassId$label == "1", "player_id"]
+    if (sum(testDataForPassId$label == "1") == 1) {
+      receiverId <- testDataForPassId[testDataForPassId$label == "1", "player_id"]
+      validPassCount <- validPassCount + 1
+    } else {
+      next
+    }
+    
     probForPassId <- predicted.prob[testIdxForPassId, "1"]
     testDataForPassId$predicted <- probForPassId
     testDataForPassIdSorted <- testDataForPassId[order(testDataForPassId$predicted, decreasing = TRUE), ]
@@ -64,8 +74,11 @@ for(i in 1:10) {
     #break
   }
   
-  top1Acc <- top1TP / length(testPassId); top3Acc <- top3TP / length(testPassId); top5Acc <- top5TP / length(testPassId) 
+  top1Acc <- top1TP / validPassCount; top3Acc <- top3TP / validPassCount; 
+  top5Acc <- top5TP / validPassCount 
   top1AccVec <- c(top1AccVec, top1Acc); top3AccVec <- c(top3AccVec, top3Acc); top5AccVec <- c(top5AccVec, top5Acc);
+  print(validPassCount)
+  print(top1Acc); print(top3Acc); print(top5Acc)
   
   #break
 }
