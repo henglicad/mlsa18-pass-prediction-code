@@ -1,7 +1,7 @@
 # predicting passing target of football
 
 library(randomForest)
-#library(caret)
+library(caret)
 
 
 setwd("/Users/hengli/Projects/mlsa18-pass-prediction/src")
@@ -46,6 +46,9 @@ for(i in 1:10) {
   trainData <- data[data$pass_id %in% trainPassId, ]
   
   ## train random forest model
+  #trainData <- downSample(trainData, trainData[, response])
+  #trainData <- upSample(trainData, trainData[, response])
+  #break
   fit.rf <- randomForest(x = trainData[, predictors], y = trainData[, response],
                          ntree = 500)#, mtry = 6, importance = TRUE)
   ## evaluate on test data
