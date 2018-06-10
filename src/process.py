@@ -4,6 +4,7 @@ import random
 import math
 import numpy as np
 import lightgbm as lgb
+import pandas as pd
 
 root = r'C:\source\github\mlsa18-pass-prediction' if os.name == 'nt' else r'/mnt/c/source/github/mlsa18-pass-prediction'
 output_separator = '\t'
@@ -53,10 +54,12 @@ class Pass(object):
         sender_closest_3_friends_dist = np.mean(sender_friends_distances[:3])
         sender_closest_opponent_dist = sender_opponent_distances[0]
         sender_closest_3_oppononents_dist = np.mean(sender_opponent_distances[:3])
-        sender_field = self.__get_player_field(self.sender_id)
+        is_sender_left_team = self.__is_player_left_team(self.sender_id)
+        sender_field = self.__get_player_field(self.sender_id, is_sender_left_team)
         is_sender_in_back_field = 1 if sender_field == 0 else 0
         is_sender_in_middle_field = 1 if sender_field == 1 else 0
         is_sender_in_front_field = 1 if sender_field == 2 else 0
+        sender_to_offense_gate_dist, sender_to_defense_gate_dist = self.__player_to_gate_distance(self.sender_id, is_sender_left_team)
     
         for player_id in self.players.keys():
             if player_id == self.sender_id: continue
@@ -72,15 +75,21 @@ class Pass(object):
             friend_distances = sorted([self.__get_distance(friend_id, player_id) for friend_id in friends.keys()])
             opponent_distances = sorted([self.__get_distance(opponent_id, player_id) for opponent_id in opponents.keys()])
             
-            player_field = self.__get_player_field(player_id)
+            is_player_left_team = self.__is_player_left_team(player_id)
+            player_field = self.__get_player_field(player_id, is_player_left_team)
             is_player_in_back_field = 1 if player_field == 0 else 0
             is_player_in_middle_field = 1 if player_field == 1 else 0
             is_player_in_front_field = 1 if player_field == 2 else 0
             is_sender_player_in_same_field = 1 if sender_field == player_field else 0
-            normalized_player_to_sender_x_diff = self.__normalized_player_to_sender_x_diff(player_id)
+            normalized_player_to_sender_x_diff = self.__normalized_player_to_sender_x_diff(player_id, is_sender_left_team)
+            
+            player_to_offense_gate_dist, player_to_defense_gate_dist = self.__player_to_gate_distance(player_id, is_player_left_team)
+            
+            opponent_to_line_dists = self.__get_min_opponent_dist_to_sender_player_line(player_id)
             
             features = []
             features.append(self.pass_id)
+            features.append(self.line_num)
             features.append(label)
             features.append(self.sender_id)
             features.append(player_id)
@@ -93,7 +102,9 @@ class Pass(object):
             #features.append(player.x)
             #features.append(player.y)
             features.append(distance)
-            features.append(self.__get_min_opponent_dist_to_sender_player_line(player_id))
+            features.append(opponent_to_line_dists[0]) # min_opponent_dist_to_sender_player_line
+            features.append(opponent_to_line_dists[1]) # second_opponent_dist_to_sender_player_line
+            features.append(opponent_to_line_dists[2]) # third_opponent_dist_to_sender_player_line
             features.append(is_sender_in_back_field)
             features.append(is_sender_in_middle_field)
             features.append(is_sender_in_front_field)
@@ -101,8 +112,13 @@ class Pass(object):
             features.append(is_player_in_middle_field)
             features.append(is_player_in_front_field)
             features.append(is_sender_player_in_same_field)
+            features.append(sender_to_offense_gate_dist)
+            features.append(sender_to_defense_gate_dist)
+            features.append(player_to_offense_gate_dist)
+            features.append(player_to_defense_gate_dist)
             features.append(normalized_player_to_sender_x_diff)
             features.append(1 if normalized_player_to_sender_x_diff >= 0 else 0) # is_player_in_offense_direction_relative_to_sender
+            features.append(math.fabs(sender.y - player.y)) # abs_y_diff
             features.append(self.__is_start_of_game())
             features.append(self.__distance_to_center(self.sender_id)) # sender_to_center_distance
             features.append(self.__distance_to_center(player_id)) # player_to_center_distance
@@ -127,6 +143,7 @@ class Pass(object):
     def get_header():
         features = [
             'pass_id',
+            'line_num',
             'label',
             'sender_id',
             'player_id',
@@ -140,6 +157,8 @@ class Pass(object):
             #'player_y',
             'distance',
             'min_opponent_dist_to_sender_player_line',
+            'second_opponent_dist_to_sender_player_line',
+            'third_opponent_dist_to_sender_player_line',
             'is_sender_in_back_field',
             'is_sender_in_middle_field',
             'is_sender_in_front_field',
@@ -147,8 +166,13 @@ class Pass(object):
             'is_player_in_middle_field',
             'is_player_in_front_field',
             'is_sender_player_in_same_field',
+            'sender_to_offense_gate_dist',
+            'sender_to_defense_gate_dist',
+            'player_to_offense_gate_dist',
+            'player_to_defense_gate_dist',
             'norm_player_sender_x_diff',
             'is_player_in_offense_direction_relative_to_sender',
+            'abs_y_diff',
             'is_start_of_game',
             'sender_to_center_distance',
             'player_to_center_distance',
@@ -164,18 +188,19 @@ class Pass(object):
             'player_closest_opponent_dist',
             'player_closest_3_oppononents_dist'
         ]
-        return output_separator.join(features)
+        return features
         
     def __get_min_opponent_dist_to_sender_player_line(self, player_id):
         if not self.__in_same_team(self.sender_id, player_id):
-            return 0
+            return [-1] * 11
         opponents = {id: self.players[id] for id in self.players.keys() if not self.__in_same_team(player_id, id)}
         sender = self.players[self.sender_id]
         player = self.players[player_id]
         sender_to_player_vec = np.array([player.x - sender.x, player.y - sender.y])
-        min_distance = 50000 # dummy large distance
+        dummy_large_distance = 50000
         if np.linalg.norm(sender_to_player_vec) < 0.0001: # if sender to player distance is too small, then don't need to calc
-            return min_distance
+            return [dummy_large_distance] * 11
+        distances = []
         for id in opponents.keys():
             opponent = opponents[id]
             sender_to_opponent_vec = np.array([opponent.x - sender.x, opponent.y - sender.y])
@@ -187,24 +212,24 @@ class Pass(object):
             distance = np.linalg.norm(projection_point_to_opponent_vec)
             projection_point_vec = np.array([sender.x, sender.y]) + sender_to_projection_point_vec
             if ((projection_point_vec[0] >= sender.x and projection_point_vec[0] <= player.x) \
-              or (projection_point_vec[0] <= sender.x and projection_point_vec[0] >= player.x)) \
-              and (distance < min_distance):
-                min_distance = distance
-        return min_distance
+              or (projection_point_vec[0] <= sender.x and projection_point_vec[0] >= player.x)):
+                distances.append(distance)
+        if len(distances) < 11:
+            distances += [dummy_large_distance] * (11 - len(distances))
+        distances.sort()
+        return distances
         
-    def __get_player_field(self, player_id):
+    def __get_player_field(self, player_id, is_player_left_team):
         # divide the field into (back, middle, front), and represent it as (0, 1, 2)
         player = self.players[player_id]
         if math.fabs(player.x) <= 1750:
             return 1
-        is_player_left_team = self.__is_player_left_team(player_id)
         if (is_player_left_team and player.x < 0) or (not is_player_left_team and player.x > 0):
             return 0
         return 2
         
-    def __normalized_player_to_sender_x_diff(self, player_id):
+    def __normalized_player_to_sender_x_diff(self, player_id, is_sender_left_team):
         # set all offense direction to be positive and defense direction to be negative
-        is_sender_left_team = self.__is_player_left_team(self.sender_id)
         x_diff = self.players[player_id].x - self.players[self.sender_id].x
         return x_diff if is_sender_left_team else (-1 * x_diff)
         
@@ -224,6 +249,14 @@ class Pass(object):
         team_players_x = [self.players[id].x for id in self.players.keys() if self.__in_same_team(player_id, id)]
         oppo_players_x = [self.players[id].x for id in self.players.keys() if not self.__in_same_team(player_id, id)]
         return np.mean(team_players_x) < np.mean(oppo_players_x)
+        
+    def __player_to_gate_distance(self, player_id, is_player_left_team):
+        player = self.players[player_id]
+        offense_gate = [5250, 0] if is_player_left_team else [-5250, 0]
+        defense_gate = [-5250, 0] if is_player_left_team else [5250, 0]
+        player_to_offense_gate_dist = np.linalg.norm(np.array([player.x , player.y]) - np.array(offense_gate))
+        player_to_defense_gate_dist = np.linalg.norm(np.array([player.x , player.y]) - np.array(defense_gate))
+        return player_to_offense_gate_dist, player_to_defense_gate_dist
         
     def __distance_to_center(self, player_id):
         return np.sqrt(self.players[player_id].x ** 2 + self.players[player_id].y ** 2)
@@ -288,50 +321,55 @@ def get_passes():
         
 def featurize():
     with open('train.tsv', 'w') as train_writer, open('val.tsv', 'w') as val_writer, open('test.tsv', 'w') as test_writer:
-        train_writer.write(Pass.get_header() + '\n')
-        val_writer.write(Pass.get_header() + '\n')
-        test_writer.write(Pass.get_header() + '\n')
+        train_writer.write(output_separator.join(Pass.get_header()) + '\n')
+        val_writer.write(output_separator.join(Pass.get_header()) + '\n')
+        test_writer.write(output_separator.join(Pass.get_header()) + '\n')
         passes = get_passes()
         counter = len(passes)
         print('Total valid samples count: %d' % counter)
         random.seed(30)
         #random.shuffle(passes)
-        train_counts = int(counter * 0.8)
-        val_counts = int(counter * 0.0)
+        train_counts = int(counter * 0.7)
+        val_counts = int(counter * 0.1)
         print('Train count: %d, val count: %d, test count: %d' % (train_counts, val_counts, counter - train_counts - val_counts))
         for i in range(counter):
+            if i % 1000 == 0: print(i)
             writer = train_writer if i <= train_counts else val_writer if i <= (train_counts+val_counts) else test_writer
             for feature in passes[i].features_generator():
                 writer.write(feature + "\n")
     with open('generated.cs', 'w') as writer:
-        for feature in Pass.get_header().split(output_separator):
+        for feature in Pass.get_header():
             writer.write("double %s = features[i++];\n" % feature.strip())
     
 def featurize_svm():
     dir = r'./lightgbm/'
-    with open(dir + 'rank.train', 'w') as train_writer, open(dir + 'rank.train.query', 'w') as train_query_writer, \
-         open(dir + 'rank.val', 'w') as val_writer, open(dir + 'rank.val.query', 'w') as val_query_writer, \
-         open(dir + 'rank.test', 'w') as test_writer, open(dir + 'rank.test.query', 'w') as test_query_writer:
+    with open(dir + 'rank.train', 'w') as train_writer, open(dir + 'rank.train.query', 'w') as train_query_writer, open(dir + 'rank.train.id', 'w') as train_id_writer,\
+         open(dir + 'rank.val', 'w') as val_writer, open(dir + 'rank.val.query', 'w') as val_query_writer, open(dir + 'rank.val.id', 'w') as val_id_writer, \
+         open(dir + 'rank.test', 'w') as test_writer, open(dir + 'rank.test.query', 'w') as test_query_writer, open(dir + 'rank.test.id', 'w') as test_id_writer:
+        headers = Pass.get_header()
         passes = get_passes()
         counter = len(passes)
         random.seed(30)
         #random.shuffle(passes)
         train_counts = int(counter * 0.7)
         val_counts = int(counter * 0.1)
-        feature_start_column = 4
+        feature_start_column = 5
         for i in range(counter):
             if i % 1000 == 0: print(i)
             writer = train_writer if i <= train_counts else val_writer if i <= (train_counts+val_counts) else test_writer
             query_writer = train_query_writer if i <= train_counts else val_query_writer if i <= (train_counts+val_counts) else test_query_writer
+            id_writer = train_id_writer if i <= train_counts else val_id_writer if i <= (train_counts+val_counts) else test_id_writer
             query_counts = 0
             for features in passes[i].features_generator(get_features=True):
                 query_counts += 1
                 output_features = []
-                output_features.append(str(features[1])) # label
+                output_features.append(str(features[2])) # label
                 for j in range(feature_start_column, len(features)):
                     if features[j] != 0:
                         output_features.append('%d:%s' % (j - feature_start_column + 1, str(features[j])))
+                        #output_features.append('%s:%s' % (headers[j], str(features[j])))
                 writer.write('%s\n' % (" ".join(output_features)))
+                id_writer.write('%d\t%d\t%d\n' % (features[0], features[1], features[4])) # pass_id, line_num, receiver_id
             query_writer.write('%d\n' % query_counts)
             
 def read_lines(reader, num):
@@ -340,18 +378,24 @@ def read_lines(reader, num):
         lines.append(reader.readline().strip())
     return lines
             
-def lightgbm_pred_accuracy(label_file, query_file, predict_file):
+def lightgbm_pred_accuracy(label_file, query_file, predict_file, id_file, output_file):
     #os.popen('/mnt/c/source/github/LightGBM/lightgbm config=lightgbm/predict.conf')
     topN = 5
     counter = 0
     topn_correct_counters = [0] * topN
     feature_reader = open(label_file, 'r')
     predict_reader = open(predict_file, 'r')
+    id_reader = open(id_file, 'r')
+    writer = open(output_file, 'w')
     pass_lines = open(query_file).readlines()
     pass_lines = [int(count) for count in pass_lines if count.strip()]
     for count in pass_lines:
         labels = [int(line.split()[0]) for line in read_lines(feature_reader, count)]
         results = [float(line) for line in read_lines(predict_reader, count)]
+        id_lines = read_lines(id_reader, count)
+        pass_id = id_lines[0].split('\t')[0]
+        line_num = id_lines[0].split('\t')[1]
+        receiver_ids = [line.split('\t')[2] for line in id_lines]
         receiver = np.argmax(labels)
         top_predictions = np.argsort(results)[::-1]
         for i in range(topN):
@@ -359,9 +403,12 @@ def lightgbm_pred_accuracy(label_file, query_file, predict_file):
             if receiver in topn_predictions:
                 topn_correct_counters[i] += 1
         counter += 1
+        ranked_receiver_ids = [receiver_ids[n] for n in top_predictions]
+        writer.write('%s\t%s\t%s\n' % (pass_id, line_num, ",".join(ranked_receiver_ids)))
     for i in range(topN):
         print("Top %d prediction accuracy: %d/%d = %f" % \
             (i+1, topn_correct_counters[i], counter, float(topn_correct_counters[i])/counter))
+    writer.close()
     
 LIGHTGBM_EXEC = '/mnt/c/source/github/LightGBM/lightgbm'
 def lightgbm_run(cmd):
@@ -378,14 +425,39 @@ def lightgbm_pipeline():
     print("Predict")
     lightgbm_run('bash predict.sh')
     print("Train accuracies")
-    lightgbm_pred_accuracy('lightgbm/rank.train', 'lightgbm/rank.train.query', 'lightgbm/LightGBM_predict_train.txt')
+    lightgbm_pred_accuracy('lightgbm/rank.train', 'lightgbm/rank.train.query', 'lightgbm/LightGBM_predict_train.txt', 'lightgbm/rank.train.id', 'lightgbm/rank.train.result')
     print("Test accuracies")
-    lightgbm_pred_accuracy('lightgbm/rank.test', 'lightgbm/rank.test.query', 'lightgbm/LightGBM_predict_test.txt')
+    lightgbm_pred_accuracy('lightgbm/rank.test', 'lightgbm/rank.test.query', 'lightgbm/LightGBM_predict_test.txt', 'lightgbm/rank.test.id', 'lightgbm/rank.test.result')
+    lightgbm_feature_importance()
+    
+def lightgbm_feature_importance():
+    model_file = 'lightgbm/LightGBM_model.txt'
+    feature_importance = False
+    headers = Pass.get_header()
+    feature_start_column = 5
+    for line in open(model_file):
+        if "feature importance" in line:
+            feature_importance = True
+            continue
+        if not feature_importance: continue
+        if not line.startswith("Column_"):
+            feature_importance = False
+            break
+        column = int(line.strip()[len("Column_"):line.find('=')])
+        value = int(line.strip()[line.find('=')+1:])
+        print('%s=%d' % (headers[column - 1 + feature_start_column], value))
+    
+def lightgbm_train():
+    df_train = pd.read_csv('train.tsv', sep='\t')
+    df_test = pd.read_csv('test.tsv', sep='\t')
+    
+    # https://github.com/Microsoft/LightGBM/blob/21487d8a28e53c63382d3ab8481b073b65176022/examples/python-guide/advanced_example.py
+    
     
 if __name__ == '__main__':
     #featurize()
     #featurize_svm()
-    #lightgbm_pred_accuracy('lightgbm/rank.train', 'lightgbm/rank.train.query', 'lightgbm/LightGBM_predict_train.txt')
-    #lightgbm_pred_accuracy('lightgbm/rank.test', 'lightgbm/rank.test.query', 'lightgbm/LightGBM_predict_test.txt')
+    #lightgbm_pred_accuracy('lightgbm/rank.train', 'lightgbm/rank.train.query', 'lightgbm/LightGBM_predict_train.txt', 'lightgbm/rank.train.id', 'lightgbm/rank.train.result')
+    #lightgbm_pred_accuracy('lightgbm/rank.test', 'lightgbm/rank.test.query', 'lightgbm/LightGBM_predict_test.txt', 'lightgbm/rank.test.id', 'lightgbm/rank.test.result')
     lightgbm_pipeline()
     
