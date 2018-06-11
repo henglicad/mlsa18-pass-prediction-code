@@ -3,8 +3,12 @@ import os
 import random
 import math
 import numpy as np
-import lightgbm as lgb
+#import lightgbm as lgb
 import pandas as pd
+import subprocess
+
+#USER = 'Zhiying'
+USER = 'Heng'
 
 root = r'C:\source\github\mlsa18-pass-prediction' if os.name == 'nt' else r'/mnt/c/source/github/mlsa18-pass-prediction'
 output_separator = '\t'
@@ -409,21 +413,31 @@ def lightgbm_pred_accuracy(label_file, query_file, predict_file, id_file, output
         print("Top %d prediction accuracy: %d/%d = %f" % \
             (i+1, topn_correct_counters[i], counter, float(topn_correct_counters[i])/counter))
     writer.close()
-    
-LIGHTGBM_EXEC = '/mnt/c/source/github/LightGBM/lightgbm'
+
+if USER == 'Zhiying':
+    LIGHTGBM_EXEC = '/mnt/c/source/github/LightGBM/lightgbm'
+elif USER == 'Heng':
+    LIGHTGBM_EXEC = '/Users/hengli/Projects/mlsa18-pass-prediction/LightGBM/lightgbm'
 def lightgbm_run(cmd):
     cwd = os.getcwd()
     os.chdir('./lightgbm')
-    os.popen(cmd)
+    #os.popen(cmd)
+    try:
+        subprocess.check_call(cmd, shell=True)
+    except subprocess.CalledProcessError as e:
+        print("Error while calling shell command: " + cmd)
     os.chdir(cwd)
     
 def lightgbm_pipeline():
     print("Featurizing")
     #featurize_svm()
     print("Train")
-    lightgbm_run(LIGHTGBM_EXEC + ' config=train.conf >train.log')
+    lightgbm_run(LIGHTGBM_EXEC + ' config=train.conf > train.log')
     print("Predict")
-    lightgbm_run('bash predict.sh')
+    if USER == 'Zhiying':
+        lightgbm_run('bash predict.sh')
+    elif USER == 'Heng':
+        lightgbm_run('bash predict_heng.sh')
     print("Train accuracies")
     lightgbm_pred_accuracy('lightgbm/rank.train', 'lightgbm/rank.train.query', 'lightgbm/LightGBM_predict_train.txt', 'lightgbm/rank.train.id', 'lightgbm/rank.train.result')
     print("Test accuracies")
