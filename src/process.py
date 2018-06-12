@@ -64,6 +64,28 @@ class Pass(object):
         is_sender_in_middle_field = 1 if sender_field == 1 else 0
         is_sender_in_front_field = 1 if sender_field == 2 else 0
         sender_to_offense_gate_dist, sender_to_defense_gate_dist = self.__player_to_gate_distance(self.sender_id, is_sender_left_team)
+        sender_friends_to_offense_gate_dists = [self.__player_to_gate_distance(friend_id, is_sender_left_team)
+                                                for friend_id in sender_friends.keys()]
+        sender_to_offense_gate_dist_rank_relative_to_friends = \
+            sum([dist < sender_to_offense_gate_dist for dist in sender_friends_to_offense_gate_dists]) + 1
+        sender_opponents_to_offense_gate_dists = [self.__player_to_gate_distance(opponent_id, is_sender_left_team)
+                                                  for opponent_id in sender_opponents.keys()]
+        sender_to_offense_gate_dist_rank_relative_to_opponents = \
+            sum([dist < sender_to_offense_gate_dist for dist in sender_opponents_to_offense_gate_dists]) + 1
+        sender_to_top_sideline_dist_rank_relative_to_friends = \
+            sum([friend.y > self.sender.y for friend in sender_friends.values()]) + 1
+        sender_to_top_sideline_dist_rank_relative_to_opponents = \
+            sum([opponent.y > self.sender.y for opponent in sender_opponents.values()]) + 1
+
+        sender_team = {candidate_id: self.players[candidate_id] for candidate_id in self.players.keys() if self.__in_same_team(self.sender_id, candidate_id)}
+        sender_team_formation_closest_dist_to_offense_gate_exclude_goalie = \
+            sorted(sender_friends_to_offense_gate_dists)[1]
+        sender_team_formation_closest_dist_to_defense_gate_exclude_goalie = \
+            sorted(sender_friends_to_offense_gate_dists, reverse=True)[1]
+        sender_team_formation_closest_dist_to_top_sideline = \
+            sorted([3400 - player.y for player in sender_team.values()])[0]
+        sender_team_formation_cloeset_dist_to_bottom_sideline = \
+            sorted([player.y - (-3400) for player in sender_team.values()])[0]
     
         for player_id in self.players.keys():
             if player_id == self.sender_id: continue
@@ -264,7 +286,8 @@ class Pass(object):
         
     def __distance_to_center(self, player_id):
         return np.sqrt(self.players[player_id].x ** 2 + self.players[player_id].y ** 2)
-        
+
+    # TODO: Looks like there is a bug: attackers can have larger |x| than goalie when attacking
     def __is_goal_keeper(self, player_id):
         friends = {candidate_id: self.players[candidate_id] for candidate_id in self.players.keys() if candidate_id != player_id and self.__in_same_team(player_id, candidate_id)}
         max_x = np.max([math.fabs(self.players[friend].x) for friend in friends])
