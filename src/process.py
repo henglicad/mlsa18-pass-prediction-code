@@ -149,8 +149,8 @@ class Pass(object):
             features.append(self.__distance_to_center(self.sender_id)) # sender_to_center_distance
             features.append(self.__distance_to_center(player_id)) # player_to_center_distance
             features.append(1 if self.__distance_to_center(player_id) <= 915 else 0) # is_player_in_center_circle
-            features.append(self.__is_goal_keeper(self.sender_id)) # is_sender_goal_keeper
-            features.append(self.__is_goal_keeper(player_id)) # is_player_goal_keeper
+            features.append(self.__is_goal_keeper(self.sender_id, is_sender_left_team)) # is_sender_goal_keeper
+            features.append(self.__is_goal_keeper(player_id, is_player_left_team)) # is_player_goal_keeper
             features.append(sender_closest_friend_dist)
             features.append(sender_closest_3_friends_dist)
             features.append(sender_closest_opponent_dist)
@@ -287,11 +287,15 @@ class Pass(object):
     def __distance_to_center(self, player_id):
         return np.sqrt(self.players[player_id].x ** 2 + self.players[player_id].y ** 2)
 
-    # TODO: Looks like there is a bug: attackers can have larger |x| than goalie when attacking
-    def __is_goal_keeper(self, player_id):
+    def __is_goal_keeper(self, player_id, is_player_left_team):
         friends = {candidate_id: self.players[candidate_id] for candidate_id in self.players.keys() if candidate_id != player_id and self.__in_same_team(player_id, candidate_id)}
-        max_x = np.max([math.fabs(self.players[friend].x) for friend in friends])
-        return 1 if math.fabs(self.players[player_id].x) >= max_x else 0
+        friends_x = [self.players[friend].x for friend in friends]
+        if is_player_left_team:
+            min_x = np.min(friends_x)
+            return 1 if self.players[player_id].x <= min_x else 0
+        else:
+            max_x = np.max(friends_x)
+            return 1 if self.players[player_id].x >= max_x else 0
         
     def __in_same_team(self, player_id_1, player_id_2):
         return (player_id_1 - 14.5) * (player_id_2 - 14.5) > 0
