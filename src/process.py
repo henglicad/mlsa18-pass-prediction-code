@@ -159,6 +159,15 @@ class Pass(object):
             features.append(np.mean(friend_distances[:3])) # closest 3 friends avg distance
             features.append(opponent_distances[0]) # closest opponent distance
             features.append(np.mean(opponent_distances[:3])) # closest 3 opponent avg distance
+            features.append(sender_to_offense_gate_dist_rank_relative_to_friends)
+            features.append(sender_to_offense_gate_dist_rank_relative_to_opponents)
+            features.append(sender_to_top_sideline_dist_rank_relative_to_friends)
+            features.append(sender_to_top_sideline_dist_rank_relative_to_opponents)
+            features.append(sender_team_formation_closest_dist_to_offense_gate_exclude_goalie)
+            features.append(sender_team_formation_closest_dist_to_defense_gate_exclude_goalie)
+            features.append(sender_team_formation_closest_dist_to_top_sideline)
+            features.append(sender_team_formation_cloeset_dist_to_bottom_sideline)
+
             
             if get_features:
                 yield features
@@ -212,7 +221,15 @@ class Pass(object):
             'player_closest_friend_dist',
             'player_closest_3_friends_dist',
             'player_closest_opponent_dist',
-            'player_closest_3_oppononents_dist'
+            'player_closest_3_oppononents_dist',
+            'sender_to_offense_gate_dist_rank_relative_to_friends',
+            'sender_to_offense_gate_dist_rank_relative_to_opponents',
+            'sender_to_top_sideline_dist_rank_relative_to_friends',
+            'sender_to_top_sideline_dist_rank_relative_to_opponents',
+            'sender_team_formation_closest_dist_to_offense_gate_exclude_goalie',
+            'sender_team_formation_closest_dist_to_defense_gate_exclude_goalie',
+            'sender_team_formation_closest_dist_to_top_sideline',
+            'sender_team_formation_cloeset_dist_to_bottom_sideline'
         ]
         return features
         
