@@ -80,10 +80,16 @@ class Pass(object):
             sum([opponent.y > sender.y for opponent in sender_opponents.values()]) + 1
 
         sender_team = {candidate_id: self.players[candidate_id] for candidate_id in self.players.keys() if self.__in_same_team(self.sender_id, candidate_id)}
-        sender_team_formation_closest_dist_to_offense_gate_exclude_goalie = \
-            sorted(sender_friends_to_offense_gate_dists)[1]
-        sender_team_formation_closest_dist_to_defense_gate_exclude_goalie = \
-            sorted(sender_friends_to_offense_gate_dists, reverse=True)[1]
+        sender_team_to_offense_goal_line_dists = [
+            self.__player_to_goal_line_distance(team_member_id, is_sender_left_team)[0] for team_member_id in
+            sender_team.keys()]
+        sender_team_to_defense_goal_line_dists = [
+            self.__player_to_goal_line_distance(team_member_id, is_sender_left_team)[1] for team_member_id in
+            sender_team.keys()]
+        sender_team_closest_dist_to_offense_goal_line = \
+            sorted(sender_team_to_offense_goal_line_dists)[0]
+        sender_team_closest_dist_to_defense_goal_line_exclude_goalie = \
+            sorted(sender_team_to_defense_goal_line_dists)[1]
         sender_team_formation_closest_dist_to_top_sideline = \
             sorted([3400 - player.y for player in sender_team.values()])[0]
         sender_team_formation_cloeset_dist_to_bottom_sideline = \
@@ -182,8 +188,8 @@ class Pass(object):
             features.append(sender_to_offense_gate_dist_rank_relative_to_opponents)
             features.append(sender_to_top_sideline_dist_rank_relative_to_friends)
             features.append(sender_to_top_sideline_dist_rank_relative_to_opponents)
-            features.append(sender_team_formation_closest_dist_to_offense_gate_exclude_goalie)
-            features.append(sender_team_formation_closest_dist_to_defense_gate_exclude_goalie)
+            features.append(sender_team_closest_dist_to_offense_goal_line)
+            features.append(sender_team_closest_dist_to_defense_goal_line_exclude_goalie)
             features.append(sender_team_formation_closest_dist_to_top_sideline)
             features.append(sender_team_formation_cloeset_dist_to_bottom_sideline)
             features.append(player_to_offense_gate_dist_rank_relative_to_friends)
@@ -248,8 +254,8 @@ class Pass(object):
             'sender_to_offense_gate_dist_rank_relative_to_opponents',
             'sender_to_top_sideline_dist_rank_relative_to_friends',
             'sender_to_top_sideline_dist_rank_relative_to_opponents',
-            'sender_team_formation_closest_dist_to_offense_gate_exclude_goalie',
-            'sender_team_formation_closest_dist_to_defense_gate_exclude_goalie',
+            'sender_team_closest_dist_to_offense_goal_line',
+            'sender_team_closest_dist_to_defense_goal_line_exclude_goalie',
             'sender_team_formation_closest_dist_to_top_sideline',
             'sender_team_formation_cloeset_dist_to_bottom_sideline',
             'player_to_offense_gate_dist_rank_relative_to_friends',
@@ -326,6 +332,14 @@ class Pass(object):
         player_to_offense_gate_dist = np.linalg.norm(np.array([player.x , player.y]) - np.array(offense_gate))
         player_to_defense_gate_dist = np.linalg.norm(np.array([player.x , player.y]) - np.array(defense_gate))
         return player_to_offense_gate_dist, player_to_defense_gate_dist
+
+    def __player_to_goal_line_distance(self, player_id, is_player_left_team):
+        player = self.players[player_id]
+        offense_goal_line_x = 5250 if is_player_left_team else -5250
+        defense_goal_line_x = -5250 if is_player_left_team else 5250
+        player_to_offense_goal_line_dist = math.fabs(offense_goal_line_x - player.x)
+        player_to_defense_goal_line_dist = math.fabs(player.x - defense_goal_line_x)
+        return player_to_offense_goal_line_dist, player_to_defense_goal_line_dist
         
     def __distance_to_center(self, player_id):
         return np.sqrt(self.players[player_id].x ** 2 + self.players[player_id].y ** 2)
@@ -414,7 +428,16 @@ def featurize():
     with open('generated.cs', 'w') as writer:
         for feature in Pass.get_header():
             writer.write("double %s = features[i++];\n" % feature.strip())
-    
+
+def outputPassingFeaturesForAll():
+    with open('passingfeatures.tsv', 'w') as feature_writer:
+        feature_writer.write(Pass.get_header() + '\n')
+        passes = get_passes()
+        counter = len(passes)
+        for i in range(counter):
+            for feature in passes[i].features_generator():
+                feature_writer.write(feature + '\n')
+
 def featurize_svm():
     dir = r'./lightgbm/'
     with open(dir + 'rank.train', 'w') as train_writer, open(dir + 'rank.train.query', 'w') as train_query_writer, open(dir + 'rank.train.id', 'w') as train_id_writer,\
