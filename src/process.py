@@ -50,6 +50,7 @@ class Pass(object):
         return output_separator.join([str(feature) for feature in features])
         
     def features_generator(self, get_features=False):
+        sender = self.players[self.sender_id]
         sender_friends = {candidate_id: self.players[candidate_id] for candidate_id in self.players.keys() if candidate_id != self.sender_id and self.__in_same_team(self.sender_id, candidate_id)}
         sender_opponents = {candidate_id: self.players[candidate_id] for candidate_id in self.players.keys() if not self.__in_same_team(self.sender_id, candidate_id)}
         sender_friends_distances = sorted([self.__get_distance(friend_id, self.sender_id) for friend_id in sender_friends.keys()])
@@ -64,18 +65,19 @@ class Pass(object):
         is_sender_in_middle_field = 1 if sender_field == 1 else 0
         is_sender_in_front_field = 1 if sender_field == 2 else 0
         sender_to_offense_gate_dist, sender_to_defense_gate_dist = self.__player_to_gate_distance(self.sender_id, is_sender_left_team)
-        sender_friends_to_offense_gate_dists = [self.__player_to_gate_distance(friend_id, is_sender_left_team)
+
+        sender_friends_to_offense_gate_dists = [self.__player_to_gate_distance(friend_id, is_sender_left_team)[0]
                                                 for friend_id in sender_friends.keys()]
         sender_to_offense_gate_dist_rank_relative_to_friends = \
             sum([dist < sender_to_offense_gate_dist for dist in sender_friends_to_offense_gate_dists]) + 1
-        sender_opponents_to_offense_gate_dists = [self.__player_to_gate_distance(opponent_id, is_sender_left_team)
+        sender_opponents_to_offense_gate_dists = [self.__player_to_gate_distance(opponent_id, is_sender_left_team)[0]
                                                   for opponent_id in sender_opponents.keys()]
         sender_to_offense_gate_dist_rank_relative_to_opponents = \
             sum([dist < sender_to_offense_gate_dist for dist in sender_opponents_to_offense_gate_dists]) + 1
         sender_to_top_sideline_dist_rank_relative_to_friends = \
-            sum([friend.y > self.sender.y for friend in sender_friends.values()]) + 1
+            sum([friend.y > sender.y for friend in sender_friends.values()]) + 1
         sender_to_top_sideline_dist_rank_relative_to_opponents = \
-            sum([opponent.y > self.sender.y for opponent in sender_opponents.values()]) + 1
+            sum([opponent.y > sender.y for opponent in sender_opponents.values()]) + 1
 
         sender_team = {candidate_id: self.players[candidate_id] for candidate_id in self.players.keys() if self.__in_same_team(self.sender_id, candidate_id)}
         sender_team_formation_closest_dist_to_offense_gate_exclude_goalie = \
@@ -89,7 +91,7 @@ class Pass(object):
     
         for player_id in self.players.keys():
             if player_id == self.sender_id: continue
-            sender = self.players[self.sender_id]
+            #sender = self.players[self.sender_id]
             player = self.players[player_id]
             
             friends = {candidate_id: self.players[candidate_id] for candidate_id in self.players.keys() if candidate_id != player_id and self.__in_same_team(player_id, candidate_id)}
@@ -117,18 +119,18 @@ class Pass(object):
 
             player_to_offense_gate_of_sender_dist, player_to_defense_gate_of_sender_dist = \
                 self.__player_to_gate_distance(player_id, is_sender_left_team)
-            player_friends_to_offense_gate_dists = [self.__player_to_gate_distance(friend_id, is_sender_left_team)
+            player_friends_to_offense_gate_dists = [self.__player_to_gate_distance(friend_id, is_sender_left_team)[0]
                                                     for friend_id in friends.keys()]
             player_to_offense_gate_dist_rank_relative_to_friends = \
                 sum([dist < player_to_offense_gate_of_sender_dist for dist in player_friends_to_offense_gate_dists]) + 1
-            player_opponents_to_offense_gate_dists = [self.__player_to_gate_distance(opponent_id, is_sender_left_team)
+            player_opponents_to_offense_gate_dists = [self.__player_to_gate_distance(opponent_id, is_sender_left_team)[0]
                                                       for opponent_id in opponents.keys()]
             player_to_offense_gate_dist_rank_relative_to_opponents = \
                 sum([dist < player_to_offense_gate_of_sender_dist for dist in player_opponents_to_offense_gate_dists]) + 1
             player_to_top_sideline_dist_rank_relative_to_friends = \
-                sum([friend.y > self.player.y for friend in friends.values()]) + 1
+                sum([friend.y > player.y for friend in friends.values()]) + 1
             player_to_top_sideline_dist_rank_relative_to_opponents = \
-                sum([opponent.y > self.player.y for opponent in opponents.values()]) + 1
+                sum([opponent.y > player.y for opponent in opponents.values()]) + 1
             
             features = []
             features.append(self.pass_id)
@@ -537,9 +539,9 @@ def lightgbm_train():
     
     
 if __name__ == '__main__':
-    #featurize()
+    featurize()
     #featurize_svm()
     #lightgbm_pred_accuracy('lightgbm/rank.train', 'lightgbm/rank.train.query', 'lightgbm/LightGBM_predict_train.txt', 'lightgbm/rank.train.id', 'lightgbm/rank.train.result')
     #lightgbm_pred_accuracy('lightgbm/rank.test', 'lightgbm/rank.test.query', 'lightgbm/LightGBM_predict_test.txt', 'lightgbm/rank.test.id', 'lightgbm/rank.test.result')
-    lightgbm_pipeline()
+    #lightgbm_pipeline()
     
