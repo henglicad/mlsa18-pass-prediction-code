@@ -112,6 +112,23 @@ class Pass(object):
             player_to_offense_gate_dist, player_to_defense_gate_dist = self.__player_to_gate_distance(player_id, is_player_left_team)
             
             opponent_to_line_dists = self.__get_min_opponent_dist_to_sender_player_line(player_id)
+
+            ## here offense gate is related to the sender (i.e., the target gate of sender)
+
+            player_to_offense_gate_of_sender_dist, player_to_defense_gate_of_sender_dist = \
+                self.__player_to_gate_distance(player_id, is_sender_left_team)
+            player_friends_to_offense_gate_dists = [self.__player_to_gate_distance(friend_id, is_sender_left_team)
+                                                    for friend_id in friends.keys()]
+            player_to_offense_gate_dist_rank_relative_to_friends = \
+                sum([dist < player_to_offense_gate_of_sender_dist for dist in player_friends_to_offense_gate_dists]) + 1
+            player_opponents_to_offense_gate_dists = [self.__player_to_gate_distance(opponent_id, is_sender_left_team)
+                                                      for opponent_id in opponents.keys()]
+            player_to_offense_gate_dist_rank_relative_to_opponents = \
+                sum([dist < player_to_offense_gate_of_sender_dist for dist in player_opponents_to_offense_gate_dists]) + 1
+            player_to_top_sideline_dist_rank_relative_to_friends = \
+                sum([friend.y > self.player.y for friend in friends.values()]) + 1
+            player_to_top_sideline_dist_rank_relative_to_opponents = \
+                sum([opponent.y > self.player.y for opponent in opponents.values()]) + 1
             
             features = []
             features.append(self.pass_id)
@@ -167,7 +184,10 @@ class Pass(object):
             features.append(sender_team_formation_closest_dist_to_defense_gate_exclude_goalie)
             features.append(sender_team_formation_closest_dist_to_top_sideline)
             features.append(sender_team_formation_cloeset_dist_to_bottom_sideline)
-
+            features.append(player_to_offense_gate_dist_rank_relative_to_friends)
+            features.append(player_to_offense_gate_dist_rank_relative_to_opponents)
+            features.append(player_to_top_sideline_dist_rank_relative_to_friends)
+            features.append(player_to_top_sideline_dist_rank_relative_to_opponents)
             
             if get_features:
                 yield features
@@ -229,7 +249,11 @@ class Pass(object):
             'sender_team_formation_closest_dist_to_offense_gate_exclude_goalie',
             'sender_team_formation_closest_dist_to_defense_gate_exclude_goalie',
             'sender_team_formation_closest_dist_to_top_sideline',
-            'sender_team_formation_cloeset_dist_to_bottom_sideline'
+            'sender_team_formation_cloeset_dist_to_bottom_sideline',
+            'player_to_offense_gate_dist_rank_relative_to_friends',
+            'player_to_offense_gate_dist_rank_relative_to_opponents',
+            'player_to_top_sideline_dist_rank_relative_to_friends',
+            'player_to_top_sideline_dist_rank_relative_to_opponents'
         ]
         return features
         
