@@ -149,6 +149,17 @@ class Pass(object):
                                                 for opponent_id in opponents.keys() if opponent_id != self.sender_id}
             player_to_sender_dist_rank_among_opponents = sum([dist < distance for dist in player_opponents_to_sender_dists]) + 1
 
+            ## passing angle
+            dangerous_opponents = [opponent_id for opponent_id in opponents.keys()
+                                   if self.__get_distance(self.sender_id, opponent_id) < distance and
+                                   self.__get_distance(player_id, opponent_id) < distance]
+            if len(dangerous_opponents) == 0:
+                min_pass_angle = 90
+            else:
+                pass_angles = [self.__calculate_sender_player_opponent_angle(self.sender_id, player_id, opponent_id)
+                               for opponent_id in dangerous_opponents]
+                min_pass_angle = np.min(pass_angles)
+
             features = []
             features.append(self.pass_id)
             features.append(self.line_num)
@@ -211,6 +222,7 @@ class Pass(object):
             features.append(sender_team_median_dist_to_top_sideline)
             features.append(player_to_sender_dist_rank_among_frends)
             features.append(player_to_sender_dist_rank_among_opponents)
+            features.append(min_pass_angle)
             
             if get_features:
                 yield features
@@ -280,7 +292,8 @@ class Pass(object):
             'sender_team_median_dist_to_offense_goal_line',
             'sender_team_median_dist_to_top_sideline',
             'player_to_sender_dist_rank_among_frends',
-            'player_to_sender_dist_rank_among_opponents'
+            'player_to_sender_dist_rank_among_opponents',
+            'min_pass_angle'
         ]
         return features
         
@@ -391,6 +404,19 @@ class Pass(object):
     def __get_sender_receiver_distance(self):
         # call __validate before this function
         return np.sqrt((self.sender.x - self.receiver.x) ** 2 + (self.sender.y - self.receiver.y) ** 2)
+
+    def __calculate_sender_player_opponent_angle(self, sender_id, player_id, opponent_id):
+        sender = self.players[sender_id]
+        opponent = self.players[opponent_id]
+        player = self.players[player_id]
+        sender_to_player = np.array([player.x, player.y]) - np.array([sender.x, sender.y])
+        sender_to_opponent = np.array([opponent.x, opponent.y]) - np.array([sender.x, sender.y])
+
+        cosine_angle = np.dot(sender_to_player, sender_to_opponent) / \
+                       (np.linalg.norm(sender_to_player) * np.linalg.norm(sender_to_opponent))
+        angle = np.arccos(cosine_angle)
+        return np.degrees(angle)
+
 
 def pass_builder(pass_id, line_num, tokens):
     players_count = 28
@@ -581,7 +607,7 @@ def lightgbm_train():
     
     
 if __name__ == '__main__':
-    featurize()
+    #featurize()
     #featurize_svm()
     #lightgbm_pred_accuracy('lightgbm/rank.train', 'lightgbm/rank.train.query', 'lightgbm/LightGBM_predict_train.txt', 'lightgbm/rank.train.id', 'lightgbm/rank.train.result')
     #lightgbm_pred_accuracy('lightgbm/rank.test', 'lightgbm/rank.test.query', 'lightgbm/LightGBM_predict_test.txt', 'lightgbm/rank.test.id', 'lightgbm/rank.test.result')
