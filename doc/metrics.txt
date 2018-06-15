@@ -29,4 +29,4 @@ Firstly use some heuristics to filter out unlikely passing targets (e.g., teamma
 
 For each candidate receiver, predict its probability to receive the ball. Metrics: receiver location, relative location to sender, passing angle, surrounding opponents.
 
-
+Build three different models when sender is at back field, central field, or front field.
