@@ -126,7 +126,6 @@ class Pass(object):
             opponent_to_line_dists = self.__get_min_opponent_dist_to_sender_player_line(player_id)
 
             ## here offense gate is related to the sender (i.e., the target gate of sender)
-
             player_to_offense_gate_of_sender_dist, player_to_defense_gate_of_sender_dist = \
                 self.__player_to_gate_distance(player_id, is_sender_left_team)
             player_friends_to_offense_gate_dists = [self.__player_to_gate_distance(friend_id, is_sender_left_team)[0]
