@@ -90,10 +90,14 @@ class Pass(object):
             sorted(sender_team_to_offense_goal_line_dists)[0]
         sender_team_closest_dist_to_defense_goal_line_exclude_goalie = \
             sorted(sender_team_to_defense_goal_line_dists)[1]
-        sender_team_formation_closest_dist_to_top_sideline = \
+        sender_team_closest_dist_to_top_sideline = \
             sorted([3400 - player.y for player in sender_team.values()])[0]
-        sender_team_formation_cloeset_dist_to_bottom_sideline = \
+        sender_team_cloeset_dist_to_bottom_sideline = \
             sorted([player.y - (-3400) for player in sender_team.values()])[0]
+        sender_team_median_dist_to_offense_goal_line = \
+            np.median(sender_team_to_offense_goal_line_dists)
+        sender_team_median_dist_to_top_sideline = \
+            np.median([3400 - player.y for player in sender_team.values()])
     
         for player_id in self.players.keys():
             if player_id == self.sender_id: continue
@@ -137,7 +141,14 @@ class Pass(object):
                 sum([friend.y > player.y for friend in friends.values()]) + 1
             player_to_top_sideline_dist_rank_relative_to_opponents = \
                 sum([opponent.y > player.y for opponent in opponents.values()]) + 1
-            
+
+            player_friends_to_sender_dists = {self.__get_distance(self.sender_id, friend_id)
+                                              for friend_id in friends.keys() if friend_id != self.sender_id}
+            player_to_sender_dist_rank_among_frends = sum([dist < distance for dist in player_friends_to_sender_dists]) + 1
+            player_opponents_to_sender_dists = {self.__get_distance(self.sender_id, opponent_id)
+                                                for opponent_id in opponents.keys() if opponent_id != self.sender_id}
+            player_to_sender_dist_rank_among_opponents = sum([dist < distance for dist in player_opponents_to_sender_dists]) + 1
+
             features = []
             features.append(self.pass_id)
             features.append(self.line_num)
@@ -190,12 +201,16 @@ class Pass(object):
             features.append(sender_to_top_sideline_dist_rank_relative_to_opponents)
             features.append(sender_team_closest_dist_to_offense_goal_line)
             features.append(sender_team_closest_dist_to_defense_goal_line_exclude_goalie)
-            features.append(sender_team_formation_closest_dist_to_top_sideline)
-            features.append(sender_team_formation_cloeset_dist_to_bottom_sideline)
+            features.append(sender_team_closest_dist_to_top_sideline)
+            features.append(sender_team_cloeset_dist_to_bottom_sideline)
             features.append(player_to_offense_gate_dist_rank_relative_to_friends)
             features.append(player_to_offense_gate_dist_rank_relative_to_opponents)
             features.append(player_to_top_sideline_dist_rank_relative_to_friends)
             features.append(player_to_top_sideline_dist_rank_relative_to_opponents)
+            features.append(sender_team_median_dist_to_offense_goal_line)
+            features.append(sender_team_median_dist_to_top_sideline)
+            features.append(player_to_sender_dist_rank_among_frends)
+            features.append(player_to_sender_dist_rank_among_opponents)
             
             if get_features:
                 yield features
@@ -245,23 +260,27 @@ class Pass(object):
             'sender_closest_friend_dist',
             'sender_closest_3_friends_dist',
             'sender_closest_opponent_dist',
-            'sender_closest_3_oppononents_dist',
+            'sender_closest_3_opponents_dist',
             'player_closest_friend_dist',
             'player_closest_3_friends_dist',
             'player_closest_opponent_dist',
-            'player_closest_3_oppononents_dist',
+            'player_closest_3_opponents_dist',
             'sender_to_offense_gate_dist_rank_relative_to_friends',
             'sender_to_offense_gate_dist_rank_relative_to_opponents',
             'sender_to_top_sideline_dist_rank_relative_to_friends',
             'sender_to_top_sideline_dist_rank_relative_to_opponents',
             'sender_team_closest_dist_to_offense_goal_line',
             'sender_team_closest_dist_to_defense_goal_line_exclude_goalie',
-            'sender_team_formation_closest_dist_to_top_sideline',
-            'sender_team_formation_cloeset_dist_to_bottom_sideline',
+            'sender_team_closest_dist_to_top_sideline',
+            'sender_team_cloeset_dist_to_bottom_sideline',
             'player_to_offense_gate_dist_rank_relative_to_friends',
             'player_to_offense_gate_dist_rank_relative_to_opponents',
             'player_to_top_sideline_dist_rank_relative_to_friends',
-            'player_to_top_sideline_dist_rank_relative_to_opponents'
+            'player_to_top_sideline_dist_rank_relative_to_opponents',
+            'sender_team_median_dist_to_offense_goal_line',
+            'sender_team_median_dist_to_top_sideline',
+            'player_to_sender_dist_rank_among_frends',
+            'player_to_sender_dist_rank_among_opponents'
         ]
         return features
         
@@ -523,7 +542,7 @@ def lightgbm_run(cmd):
     
 def lightgbm_pipeline():
     print("Featurizing")
-    #featurize_svm()
+    featurize_svm()
     print("Train")
     lightgbm_run(LIGHTGBM_EXEC + ' config=train.conf > train.log')
     print("Predict")
@@ -566,5 +585,5 @@ if __name__ == '__main__':
     #featurize_svm()
     #lightgbm_pred_accuracy('lightgbm/rank.train', 'lightgbm/rank.train.query', 'lightgbm/LightGBM_predict_train.txt', 'lightgbm/rank.train.id', 'lightgbm/rank.train.result')
     #lightgbm_pred_accuracy('lightgbm/rank.test', 'lightgbm/rank.test.query', 'lightgbm/LightGBM_predict_test.txt', 'lightgbm/rank.test.id', 'lightgbm/rank.test.result')
-    #lightgbm_pipeline()
+    lightgbm_pipeline()
     
