@@ -6,7 +6,7 @@ import numpy as np
 #import lightgbm as lgb
 import pandas as pd
 import subprocess
-
+import datetime
 #USER = 'Zhiying'
 USER = 'Heng'
 
@@ -453,6 +453,8 @@ def get_passes():
         
 def featurize():
     with open('train.tsv', 'w') as train_writer, open('val.tsv', 'w') as val_writer, open('test.tsv', 'w') as test_writer:
+        has_checked_feature_count = False
+        header_item_count = len(Pass.get_header())
         train_writer.write(output_separator.join(Pass.get_header()) + '\n')
         val_writer.write(output_separator.join(Pass.get_header()) + '\n')
         test_writer.write(output_separator.join(Pass.get_header()) + '\n')
@@ -469,6 +471,10 @@ def featurize():
             writer = train_writer if i <= train_counts else val_writer if i <= (train_counts+val_counts) else test_writer
             for feature in passes[i].features_generator():
                 writer.write(feature + "\n")
+                if not has_checked_feature_count:
+                    feature_count = len(feature.split(output_separator))
+                    assert feature_count == header_item_count, 'Feature count (%d) is not the same as header count (%d)' % (feature_count, header_item_count)
+                    has_checked_feature_count = True
     with open('generated.cs', 'w') as writer:
         for feature in Pass.get_header():
             writer.write("double %s = features[i++];\n" % feature.strip())
@@ -546,10 +552,16 @@ def lightgbm_pred_accuracy(label_file, query_file, predict_file, id_file, output
         counter += 1
         ranked_receiver_ids = [receiver_ids[n] for n in top_predictions]
         writer.write('%s\t%s\t%s\n' % (pass_id, line_num, ",".join(ranked_receiver_ids)))
+    topN_accuracies = [0] * topN
     for i in range(topN):
+        topN_accuracies[i] = float(topn_correct_counters[i])/counter
         print("Top %d prediction accuracy: %d/%d = %f" % \
-            (i+1, topn_correct_counters[i], counter, float(topn_correct_counters[i])/counter))
+            (i+1, topn_correct_counters[i], counter, topN_accuracies[i]))
     writer.close()
+    return topN_accuracies
+    
+def xgboost_pred_accuracy(label_file, query_file, predict_file, id_file, output_file):
+    lightgbm_pred_accuracy(label_file, query_file, predict_file, id_file, output_file)
 
 if USER == 'Zhiying':
     LIGHTGBM_EXEC = '/mnt/c/source/github/LightGBM/lightgbm'
@@ -575,11 +587,13 @@ def lightgbm_pipeline():
         lightgbm_run('bash predict.sh')
     elif USER == 'Heng':
         lightgbm_run('bash predict_heng.sh')
-    print("Train accuracies")
+    print("Train accuracies:")
     lightgbm_pred_accuracy('lightgbm/rank.train', 'lightgbm/rank.train.query', 'lightgbm/LightGBM_predict_train.txt', 'lightgbm/rank.train.id', 'lightgbm/rank.train.result')
-    print("Test accuracies")
-    lightgbm_pred_accuracy('lightgbm/rank.test', 'lightgbm/rank.test.query', 'lightgbm/LightGBM_predict_test.txt', 'lightgbm/rank.test.id', 'lightgbm/rank.test.result')
-    lightgbm_feature_importance()
+    print("Validation accuracies:")
+    lightgbm_pred_accuracy('lightgbm/rank.val', 'lightgbm/rank.val.query', 'lightgbm/LightGBM_predict_val.txt', 'lightgbm/rank.val.id', 'lightgbm/rank.val.result')
+    print("Test accuracies:")
+    #lightgbm_pred_accuracy('lightgbm/rank.test', 'lightgbm/rank.test.query', 'lightgbm/LightGBM_predict_test.txt', 'lightgbm/rank.test.id', 'lightgbm/rank.test.result')
+    #lightgbm_feature_importance()
     
 def lightgbm_feature_importance():
     model_file = 'lightgbm/LightGBM_model.txt'
@@ -604,11 +618,80 @@ def lightgbm_train():
     
     # https://github.com/Microsoft/LightGBM/blob/21487d8a28e53c63382d3ab8481b073b65176022/examples/python-guide/advanced_example.py
     
+def update_train_config(params, input_config, output_config):
+    writer = open(output_config, 'w')
+    for line in open(input_config, 'r'):
+        line = line.strip()
+        for key in params.keys():
+            if line.startswith(key):
+                line = '%s = %s' % (key, str(params[key]))
+                break
+        writer.write(line + '\n')
+    writer.close()
+    
+def lightgbm_train_test_with_param(params):
+    update_train_config(params, 'lightgbm/train.default.config', 'lightgbm/train.tmp.config')
+    print(str(params))
+    print("Train")
+    lightgbm_run(LIGHTGBM_EXEC + ' config=train.tmp.config >train.log')
+    print("Predict")
+    lightgbm_run('bash predict.sh')
+    print("Train accuracies:")
+    train_accuracies = lightgbm_pred_accuracy('lightgbm/rank.train', 'lightgbm/rank.train.query', 'lightgbm/LightGBM_predict_train.txt', 'lightgbm/rank.train.id', 'lightgbm/rank.train.result')
+    print("Validation accuracies:")
+    val_accuracies = lightgbm_pred_accuracy('lightgbm/rank.val', 'lightgbm/rank.val.query', 'lightgbm/LightGBM_predict_val.txt', 'lightgbm/rank.val.id', 'lightgbm/rank.val.result')
+    #print("Test accuracies:")
+    #lightgbm_pred_accuracy('lightgbm/rank.test', 'lightgbm/rank.test.query', 'lightgbm/LightGBM_predict_test.txt', 'lightgbm/rank.test.id', 'lightgbm/rank.test.result')
+    return (train_accuracies, val_accuracies)
+    
+def params_generator(params_to_sweep):
+    key_count = len(params_to_sweep.keys())
+    assert key_count >= 1
+    random_key = params_to_sweep.keys()[0]
+    for value in params_to_sweep[random_key]:
+        params = {random_key: value}
+        if key_count == 1:
+            yield params
+        else:
+            sub_params_to_sweep = params_to_sweep.copy()
+            del sub_params_to_sweep[random_key]
+            for dict in params_generator(sub_params_to_sweep):
+                params.update(dict)
+                yield params
+        
+def hyper_parameter_sweep():
+    #params_to_sweep = {'learning_rate': [0.05, 0.1, 0.2], 'num_trees': [50, 100, 200, 500], 'num_leaves': [31, 63]}
+    params_to_sweep = {'learning_rate': [0.05, 0.07], 'num_trees': [200, 500], 'min_data_in_leaf': [50, 100, 500]}
+    params_count = 1
+    for key in params_to_sweep.keys():
+        params_count *= len(params_to_sweep[key])
+    print('Totally %d parameters to sweep\n' % params_count)
+    writer = open('tmp.tsv', 'w')
+    results= {}
+    top1_val_results = {}
+    counter = 0
+    for params in params_generator(params_to_sweep):
+        print('\nParameter count: %d' % counter)
+        counter += 1
+        start_time = datetime.datetime.now()
+        train_accuracies, val_accuracies = lightgbm_train_test_with_param(params)
+        print('Finished in %f seconds' % (datetime.datetime.now() - start_time).total_seconds())
+        writer.write('\n\n%s\nTrain accuracies: %s\nValid accuracies: %s\n' % (str(params), str(train_accuracies), str(val_accuracies)))
+        writer.flush()
+        top1_val_results[str(params)] = val_accuracies[0]
+        results[str(params)] = (train_accuracies, val_accuracies)
+    writer.write('\nSorted val accuracies:\n')
+    for r in sorted(top1_val_results, key=top1_val_results.get, reverse=True):
+        writer.write('%s: top1_val_acc: %f, top1_train_acc: %f\n' % (r, top1_val_results[r], results[r][0][0]))
+    writer.close()
     
 if __name__ == '__main__':
     #featurize()
     #featurize_svm()
     #lightgbm_pred_accuracy('lightgbm/rank.train', 'lightgbm/rank.train.query', 'lightgbm/LightGBM_predict_train.txt', 'lightgbm/rank.train.id', 'lightgbm/rank.train.result')
     #lightgbm_pred_accuracy('lightgbm/rank.test', 'lightgbm/rank.test.query', 'lightgbm/LightGBM_predict_test.txt', 'lightgbm/rank.test.id', 'lightgbm/rank.test.result')
-    lightgbm_pipeline()
+    #lightgbm_pipeline()
+    #xgboost_pred_accuracy('xgboost/rank.test', 'xgboost/rank.test.group', 'xgboost/pred.txt', 'lightgbm/rank.test.id', 'xgboost/rank.test.result')
+    #lightgbm_train_test_with_param({})#{'learning_rate': 0.05, 'num_trees': 500})
+    hyper_parameter_sweep()
     
