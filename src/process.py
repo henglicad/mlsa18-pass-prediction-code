@@ -741,6 +741,54 @@ def lightgbm_python():
     #print(y_pred[:10])
     #print(y_pred.shape)
     
+def remove_features(infile, outfile, allowed_features):
+    writer = open(outfile, 'w')
+    for line in open(infile):
+        if not line.strip(): continue
+        tokens = line.strip().split()
+        output_features = []
+        label = True
+        for token in tokens:
+            if label:
+                output_features.append(token)
+                label = False
+                continue
+            feature_id = int(token.split(':')[0])
+            if feature_id in allowed_features:
+                output_features.append(token)
+        if len(output_features) < 2:
+            output_features.append('%d:0' % list(allowed_features)[0])
+        writer.write('%s\n' % ' '.join(output_features))
+    writer.close()
+    
+def train_test_single_feature():
+    headers = Pass.get_header()
+    writer = open('tmp.tsv', 'w')
+    results= {}
+    top1_val_results = {}
+    for i in range(1, 52):
+        print('Feature %s (%d)' % (headers[i - 1 + 5], i))
+        remove_features('lightgbm/rank.default.train', 'lightgbm/rank.train', set([i]))
+        remove_features('lightgbm/rank.default.val', 'lightgbm/rank.val', set([i]))
+        print("Train")
+        lightgbm_run(LIGHTGBM_EXEC + ' config=train.conf > train.log')
+        print("Predict")
+        if USER == 'Zhiying':
+            lightgbm_run('bash predict.sh')
+        elif USER == 'Heng':
+            lightgbm_run('bash predict_heng.sh')
+        print("Train accuracies:")
+        train_accuracies = lightgbm_pred_accuracy('lightgbm/rank.train', 'lightgbm/rank.train.query', 'lightgbm/LightGBM_predict_train.txt', 'lightgbm/rank.train.id', 'lightgbm/rank.train.result')
+        print("Valid accuracies:")
+        val_accuracies = lightgbm_pred_accuracy('lightgbm/rank.val', 'lightgbm/rank.val.query', 'lightgbm/LightGBM_predict_val.txt', 'lightgbm/rank.val.id', 'lightgbm/rank.val.result')
+        top1_val_results[i] = val_accuracies[0]
+        results[i] = (train_accuracies, val_accuracies)
+    writer.write('\nSorted val accuracies:\n')
+    for r in sorted(top1_val_results, key=top1_val_results.get, reverse=True):
+        feature_name = headers[r - 1 + 5]
+        writer.write('Feature %s (%d): top1_val_acc: %f, top1_train_acc: %f\n' % (feature_name, r, top1_val_results[r], results[r][0][0]))
+    writer.close()
+    
 if __name__ == '__main__':
     #featurize()
     #featurize_svm()
@@ -753,4 +801,6 @@ if __name__ == '__main__':
     #lightgbm_train_test_with_param({'learning_rate': 0.07, 'min_data_in_leaf': 50, 'num_trees': 200})
     #hyper_parameter_sweep()
     #lightgbm_python()
-    model_ensemble()
+    #model_ensemble()
+    train_test_single_feature()
+    
