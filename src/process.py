@@ -437,6 +437,8 @@ class Pass(object):
 
         cosine_angle = np.dot(sender_to_player, sender_to_opponent) / \
                        (np.linalg.norm(sender_to_player) * np.linalg.norm(sender_to_opponent))
+        cosine_angle = max(cosine_angle, -1.0)
+        cosine_angle = min(cosine_angle, 1.0)
         angle = np.arccos(cosine_angle)
         return np.degrees(angle)
 
