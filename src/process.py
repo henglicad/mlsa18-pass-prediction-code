@@ -497,9 +497,9 @@ def featurize():
         for feature in Pass.get_header():
             writer.write("double %s = features[i++];\n" % feature.strip())
 
-def outputPassingFeaturesForAll():
+def writePassingFeaturesInSingleFile():
     with open('passingfeatures.tsv', 'w') as feature_writer:
-        feature_writer.write(Pass.get_header() + '\n')
+        feature_writer.write(output_separator.join(Pass.get_header()) + '\n')
         passes = get_passes()
         counter = len(passes)
         for i in range(counter):
@@ -808,9 +808,10 @@ def train_test_single_feature():
 if __name__ == '__main__':
     #featurize()
     #featurize_svm()
+    writePassingFeaturesInSingleFile()
     #lightgbm_pred_accuracy('lightgbm/rank.train', 'lightgbm/rank.train.query', 'lightgbm/LightGBM_predict_train.txt', 'lightgbm/rank.train.id', 'lightgbm/rank.train.result')
     #lightgbm_pred_accuracy('lightgbm/rank.test', 'lightgbm/rank.test.query', 'lightgbm/LightGBM_predict_test.txt', 'lightgbm/rank.test.id', 'lightgbm/rank.test.result')
-    lightgbm_pipeline()
+    #lightgbm_pipeline()
     #xgboost_pred_accuracy('xgboost/rank.test', 'xgboost/rank.test.group', 'xgboost/pred.txt', 'lightgbm/rank.test.id', 'xgboost/rank.test.result')
     #lightgbm_train_test_with_param({'num_leaves': 31, 'learning_rate': 0.05, 'min_data_in_leaf': 50, 'num_trees': 500, 'bagging_fraction': 0.5, 'feature_fraction': 0.5})
     #lightgbm_train_test_with_param({'learning_rate': 0.05, 'min_data_in_leaf': 500, 'num_trees': 500, 'bagging_fraction': 0.5, 'feature_fraction': 1})
