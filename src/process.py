@@ -8,8 +8,14 @@ import pandas as pd
 import subprocess
 import datetime
 import time
-#USER = 'Zhiying'
-USER = 'Heng'
+from tqdm import tqdm
+from multiprocessing import Pool
+USER = 'Zhiying'
+#USER = 'Heng'
+if USER == 'Zhiying':
+    THREAD_COUNT = 4
+else:
+    THREAD_COUNT = 8
 from sklearn.datasets import load_svmlight_file
 
 root = r'C:\source\github\mlsa18-pass-prediction' if os.name == 'nt' else r'/mnt/c/source/github/mlsa18-pass-prediction'
@@ -469,14 +475,24 @@ def get_passes():
         pass_id += 1
     return passes
         
+def featurize_one_pass(a_pass):
+    all_features = []
+    for features in a_pass.features_generator(get_features=True):
+        output_features = [str(feature) for feature in features]
+        all_features.append(output_features)
+    return all_features
+        
 def featurize():
+    pool = Pool(THREAD_COUNT)
+    passes = get_passes()
+    data = pool.map(featurize_one_pass, tqdm(passes))
+    headers = Pass.get_header()
+    assert len(data[0][0]) == len(headers), 'Feature count (%d) is not the same as header count (%d)' % (len(data[0][0]), len(headers))
     with open('train.tsv', 'w') as train_writer, open('val.tsv', 'w') as val_writer, open('test.tsv', 'w') as test_writer:
-        has_checked_feature_count = False
         header_item_count = len(Pass.get_header())
         train_writer.write(output_separator.join(Pass.get_header()) + '\n')
         val_writer.write(output_separator.join(Pass.get_header()) + '\n')
         test_writer.write(output_separator.join(Pass.get_header()) + '\n')
-        passes = get_passes()
         counter = len(passes)
         print('Total valid samples count: %d' % counter)
         random.seed(30)
@@ -487,12 +503,8 @@ def featurize():
         for i in range(counter):
             if i % 1000 == 0: print(i)
             writer = train_writer if i <= train_counts else val_writer if i <= (train_counts+val_counts) else test_writer
-            for feature in passes[i].features_generator():
-                writer.write(feature + "\n")
-                if not has_checked_feature_count:
-                    feature_count = len(feature.split(output_separator))
-                    assert feature_count == header_item_count, 'Feature count (%d) is not the same as header count (%d)' % (feature_count, header_item_count)
-                    has_checked_feature_count = True
+            for features in data[i]:
+                writer.write(output_separator.join(features) + "\n")
     with open('generated.cs', 'w') as writer:
         for feature in Pass.get_header():
             writer.write("double %s = features[i++];\n" % feature.strip())
@@ -507,15 +519,20 @@ def writePassingFeaturesInSingleFile():
                 feature_writer.write(feature + '\n')
 
 def featurize_svm():
+    # multi-threaded version, 1.6 times faster
+    start_time = datetime.datetime.now()
+    pool = Pool(THREAD_COUNT)
+    passes = get_passes()
+    data = pool.map(featurize_one_pass, tqdm(passes))
     dir = r'./lightgbm/'
+    headers = Pass.get_header()
+    assert len(data[0][0]) == len(headers), 'Feature count (%d) is not the same as header count (%d)' % (len(data[0][0]), len(headers))
     with open(dir + 'rank.train', 'w') as train_writer, open(dir + 'rank.train.query', 'w') as train_query_writer, open(dir + 'rank.train.id', 'w') as train_id_writer,\
          open(dir + 'rank.val', 'w') as val_writer, open(dir + 'rank.val.query', 'w') as val_query_writer, open(dir + 'rank.val.id', 'w') as val_id_writer, \
          open(dir + 'rank.test', 'w') as test_writer, open(dir + 'rank.test.query', 'w') as test_query_writer, open(dir + 'rank.test.id', 'w') as test_id_writer:
-        headers = Pass.get_header()
-        passes = get_passes()
-        counter = len(passes)
+        counter = len(data)
         random.seed(30)
-        #random.shuffle(passes)
+        #random.shuffle(data)
         train_counts = int(counter * 0.7)
         val_counts = int(counter * 0.1)
         feature_start_column = 5
@@ -524,18 +541,17 @@ def featurize_svm():
             writer = train_writer if i <= train_counts else val_writer if i <= (train_counts+val_counts) else test_writer
             query_writer = train_query_writer if i <= train_counts else val_query_writer if i <= (train_counts+val_counts) else test_query_writer
             id_writer = train_id_writer if i <= train_counts else val_id_writer if i <= (train_counts+val_counts) else test_id_writer
-            query_counts = 0
-            for features in passes[i].features_generator(get_features=True):
-                query_counts += 1
+            for features in data[i]:
                 output_features = []
-                output_features.append(str(features[2])) # label
+                output_features.append(features[2]) # label
                 for j in range(feature_start_column, len(features)):
                     if features[j] != 0:
-                        output_features.append('%d:%s' % (j - feature_start_column + 1, str(features[j])))
-                        #output_features.append('%s:%s' % (headers[j], str(features[j])))
+                        output_features.append('%d:%s' % (j - feature_start_column + 1, features[j]))
+                        #output_features.append('%s:%s' % (headers[j], features[j]))
                 writer.write('%s\n' % (" ".join(output_features)))
-                id_writer.write('%d\t%d\t%d\n' % (features[0], features[1], features[4])) # pass_id, line_num, receiver_id
-            query_writer.write('%d\n' % query_counts)
+                id_writer.write('%s\t%s\t%s\n' % (features[0], features[1], features[4])) # pass_id, line_num, receiver_id
+            query_writer.write('%d\n' % len(data[i]))
+    print('Finished featurize_svm in %f seconds' % ((datetime.datetime.now() - start_time).total_seconds()))
             
 def read_lines(reader, num):
     lines = []
@@ -715,6 +731,12 @@ def avg_pred_results(readers, out_file):
     writer.close()
     
 def model_ensemble():
+    lightgbm_train_test_with_param({'num_leaves': 31, 'learning_rate': 0.05, 'min_data_in_leaf': 50, 'num_trees': 500, 'bagging_fraction': 0.5, 'feature_fraction': 0.5})
+    lightgbm_run('mv LightGBM_model.txt LightGBM_model_1.txt')
+    lightgbm_train_test_with_param({'learning_rate': 0.05, 'min_data_in_leaf': 500, 'num_trees': 500, 'bagging_fraction': 0.5, 'feature_fraction': 1})
+    lightgbm_run('mv LightGBM_model.txt LightGBM_model_2.txt')
+    #lightgbm_train_test_with_param({'learning_rate': 0.07, 'min_data_in_leaf': 50, 'num_trees': 200})
+    #lightgbm_run('mv LightGBM_model.txt LightGBM_model_3.txt')
     model_files = ['LightGBM_model_1.txt', 'LightGBM_model_2.txt']#, 'LightGBM_model_3.txt']
     output_train_files = []
     output_test_files = []
