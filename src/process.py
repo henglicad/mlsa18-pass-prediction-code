@@ -8,8 +8,8 @@ import pandas as pd
 import subprocess
 import datetime
 import time
-USER = 'Zhiying'
-#USER = 'Heng'
+#USER = 'Zhiying'
+USER = 'Heng'
 from sklearn.datasets import load_svmlight_file
 
 root = r'C:\source\github\mlsa18-pass-prediction' if os.name == 'nt' else r'/mnt/c/source/github/mlsa18-pass-prediction'
@@ -108,7 +108,7 @@ class Pass(object):
             
             friends = {candidate_id: self.players[candidate_id] for candidate_id in self.players.keys() if candidate_id != player_id and self.__in_same_team(player_id, candidate_id)}
             opponents = {candidate_id: self.players[candidate_id] for candidate_id in self.players.keys() if not self.__in_same_team(player_id, candidate_id)}
-            
+
             label = 1 if player_id == self.receiver_id else 0
             is_in_same_team = 1 if self.sender_id in friends.keys() else 0
             distance = self.__get_distance(self.sender_id, player_id)
@@ -145,7 +145,7 @@ class Pass(object):
 
             player_friends_to_sender_dists = {self.__get_distance(self.sender_id, friend_id)
                                               for friend_id in friends.keys() if friend_id != self.sender_id}
-            player_to_sender_dist_rank_among_frends = sum([dist < distance for dist in player_friends_to_sender_dists]) + 1
+            player_to_sender_dist_rank_among_friends = sum([dist < distance for dist in player_friends_to_sender_dists]) + 1
             player_opponents_to_sender_dists = {self.__get_distance(self.sender_id, opponent_id)
                                                 for opponent_id in opponents.keys() if opponent_id != self.sender_id}
             player_to_sender_dist_rank_among_opponents = sum([dist < distance for dist in player_opponents_to_sender_dists]) + 1
@@ -160,6 +160,15 @@ class Pass(object):
                 pass_angles = [self.__calculate_sender_player_opponent_angle(self.sender_id, player_id, opponent_id)
                                for opponent_id in dangerous_opponents]
                 min_pass_angle = np.min(pass_angles)
+            dangerous_opponents_num = len(dangerous_opponents)
+
+            ## closest friends/opponents features
+            closest_friend_id = sorted(friends.keys(),
+                                       key=lambda friend_id: self.__get_distance(player_id, friend_id))[0]
+            closest_opponent_id = sorted(opponents.keys(),
+                                         key=lambda opponent_id: self.__get_distance(player_id, opponent_id))[0]
+            closest_friend_to_sender_dist = self.__get_distance(self.sender_id, closest_friend_id)
+            closest_opponent_to_sender_dist = self.__get_distance(self.sender_id, closest_opponent_id)
 
             features = []
             features.append(self.pass_id)
@@ -221,9 +230,13 @@ class Pass(object):
             features.append(player_to_top_sideline_dist_rank_relative_to_opponents)
             features.append(sender_team_median_dist_to_offense_goal_line)
             features.append(sender_team_median_dist_to_top_sideline)
-            features.append(player_to_sender_dist_rank_among_frends)
+            features.append(player_to_sender_dist_rank_among_friends)
             features.append(player_to_sender_dist_rank_among_opponents)
             features.append(min_pass_angle)
+            features.append(dangerous_opponents_num)
+            features.append(closest_friend_to_sender_dist)
+            features.append(closest_opponent_to_sender_dist)
+
             
             if get_features:
                 yield features
@@ -292,9 +305,12 @@ class Pass(object):
             'player_to_top_sideline_dist_rank_relative_to_opponents',
             'sender_team_median_dist_to_offense_goal_line',
             'sender_team_median_dist_to_top_sideline',
-            'player_to_sender_dist_rank_among_frends',
+            'player_to_sender_dist_rank_among_friends',
             'player_to_sender_dist_rank_among_opponents',
-            'min_pass_angle'
+            'min_pass_angle',
+            'dangerous_opponents_num',
+            'closest_friend_to_sender_dist',
+            'closest_opponent_to_sender_dist'
         ]
         return features
         
@@ -581,7 +597,7 @@ def lightgbm_run(cmd):
     
 def lightgbm_pipeline():
     print("Featurizing")
-    #featurize_svm()
+    featurize_svm()
     print("Train")
     lightgbm_run(LIGHTGBM_EXEC + ' config=train.conf > train.log')
     print("Predict")
@@ -794,7 +810,7 @@ if __name__ == '__main__':
     #featurize_svm()
     #lightgbm_pred_accuracy('lightgbm/rank.train', 'lightgbm/rank.train.query', 'lightgbm/LightGBM_predict_train.txt', 'lightgbm/rank.train.id', 'lightgbm/rank.train.result')
     #lightgbm_pred_accuracy('lightgbm/rank.test', 'lightgbm/rank.test.query', 'lightgbm/LightGBM_predict_test.txt', 'lightgbm/rank.test.id', 'lightgbm/rank.test.result')
-    #lightgbm_pipeline()
+    lightgbm_pipeline()
     #xgboost_pred_accuracy('xgboost/rank.test', 'xgboost/rank.test.group', 'xgboost/pred.txt', 'lightgbm/rank.test.id', 'xgboost/rank.test.result')
     #lightgbm_train_test_with_param({'num_leaves': 31, 'learning_rate': 0.05, 'min_data_in_leaf': 50, 'num_trees': 500, 'bagging_fraction': 0.5, 'feature_fraction': 0.5})
     #lightgbm_train_test_with_param({'learning_rate': 0.05, 'min_data_in_leaf': 500, 'num_trees': 500, 'bagging_fraction': 0.5, 'feature_fraction': 1})
@@ -802,5 +818,5 @@ if __name__ == '__main__':
     #hyper_parameter_sweep()
     #lightgbm_python()
     #model_ensemble()
-    train_test_single_feature()
+    #train_test_single_feature()
     
