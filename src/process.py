@@ -160,15 +160,15 @@ class Pass(object):
                 pass_angles = [self.__calculate_sender_player_opponent_angle(self.sender_id, player_id, opponent_id)
                                for opponent_id in dangerous_opponents]
                 min_pass_angle = np.min(pass_angles)
-            dangerous_opponents_num = len(dangerous_opponents)
+            num_dangerous_opponents_along_passing_line = len(dangerous_opponents)
 
             ## closest friends/opponents features
             closest_friend_id = sorted(friends.keys(),
                                        key=lambda friend_id: self.__get_distance(player_id, friend_id))[0]
             closest_opponent_id = sorted(opponents.keys(),
                                          key=lambda opponent_id: self.__get_distance(player_id, opponent_id))[0]
-            closest_friend_to_sender_dist = self.__get_distance(self.sender_id, closest_friend_id)
-            closest_opponent_to_sender_dist = self.__get_distance(self.sender_id, closest_opponent_id)
+            player_closest_friend_to_sender_dist = self.__get_distance(self.sender_id, closest_friend_id)
+            player_closest_opponent_to_sender_dist = self.__get_distance(self.sender_id, closest_opponent_id)
 
             features = []
             features.append(self.pass_id)
@@ -233,9 +233,9 @@ class Pass(object):
             features.append(player_to_sender_dist_rank_among_friends)
             features.append(player_to_sender_dist_rank_among_opponents)
             features.append(min_pass_angle)
-            features.append(dangerous_opponents_num)
-            features.append(closest_friend_to_sender_dist)
-            features.append(closest_opponent_to_sender_dist)
+            features.append(num_dangerous_opponents_along_passing_line)
+            features.append(player_closest_friend_to_sender_dist)
+            features.append(player_closest_opponent_to_sender_dist)
 
             
             if get_features:
@@ -308,9 +308,9 @@ class Pass(object):
             'player_to_sender_dist_rank_among_friends',
             'player_to_sender_dist_rank_among_opponents',
             'min_pass_angle',
-            'dangerous_opponents_num',
-            'closest_friend_to_sender_dist',
-            'closest_opponent_to_sender_dist'
+            'num_dangerous_opponents_along_passing_line',
+            'player_closest_friend_to_sender_dist',
+            'player_closest_opponent_to_sender_dist'
         ]
         return features
         
