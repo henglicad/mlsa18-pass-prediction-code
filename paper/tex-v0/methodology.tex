@@ -1,2 +1,18 @@
 \section{Methodology} \label{methodology}
 This section discuss our overall methodology, our feature extraction, feature selection, modeling approaches, and evaluation approaches.
+
+\subsection{Feature extraction}
+
+In this work, we extract four dimensions of features to explain the likelihood of passing the ball to a certain target.
+\begin{itemize}
+	\item \textbf{Sender position features.} This dimension of features capture the position of the sender on the field, such as the sender's distance to the other team's goal. We choose this dimension of features because players have different passing strategies at different positions, for example, players may pass the ball more conservatively in their own half but more aggressively in the other team's half.
+	\item \textbf{Receiver position features.} This dimension of features capture the position of a candidate receiver, such as the candidate receiver's distance to the sender. Senders always consider candidate receivers' positions when they decide the target of a pass.
+	\item \textbf{Passing path features.} This dimension of features measure the quality of a passing path (i.e., the path from the sender to a candidate receiver), such as the passing angle. The quality of a passing path can predict the outcome (success/failure) of a pass.
+	\item \textbf{Team position features.} This dimension of features capture the overall position of the team in control of the ball, such as the front line of the team. Team position might also impact the passing strategy, for example, a defensive team position might be more likely to pass the ball forwards.
+\end{itemize}
+
+\subsection{Feature selection}
+
+\subsection{Modeling approaches}
+
+\subsection{Evaluation approaches}
