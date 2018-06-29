@@ -19,6 +19,11 @@ In this work, we extract four dimensions of features to explain the likelihood o
 
 \subsection{Evaluation approaches}
 
-In each fold, we use the $top-k$ accuracy to measure the performance.
+We use \textit{top-n} accuracy and mean reciprocal rank (RR) to measure the performance of our models.
+The \textit{top-n} accuracy measures the probability that the actual target of a pass appears in the top \textit{n} predicted targets (i.e., the \textit{n} players with the highest predicted probability of being the target).
+The \textit{top-1} accuracy measures the probability that the actual target of a pass is the player with the highest predicted probability.
+The RR is the reciprocal rank of the actual target among all the players according to the predicted probability of being target.
+The mean RR is the average of the reciprocal ranks over a sample of passes.
+While the \textit{top-n} accuracy measures how likely the actual target appears in the top \textit{n} predicted targets, the mean RR measures the average rank of the actual targets in the predicted results.
 
 We use 10-fold cross-validation to evaluate the performance of our models. 
