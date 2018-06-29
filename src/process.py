@@ -10,8 +10,8 @@ import datetime
 import time
 from tqdm import tqdm
 from multiprocessing import Pool
-USER = 'Zhiying'
-#USER = 'Heng'
+#USER = 'Zhiying'
+USER = 'Heng'
 if USER == 'Zhiying':
     THREAD_COUNT = 4
 else:
@@ -186,10 +186,10 @@ class Pass(object):
             features.append(self.time_start)
             #features.append(self.time_end - self.time_start) # duration
             #features.append(distance / (self.time_end - self.time_start + 0.0001)) # ball speed
-            #features.append(sender.x)
-            #features.append(sender.y)
-            #features.append(player.x)
-            #features.append(player.y)
+            features.append(sender.x)
+            features.append(sender.y)
+            features.append(player.x)
+            features.append(player.y)
             features.append(distance)
             features.append(opponent_to_line_dists[0]) # min_opponent_dist_to_sender_player_line
             features.append(opponent_to_line_dists[1]) # second_opponent_dist_to_sender_player_line
@@ -261,10 +261,10 @@ class Pass(object):
             'time_start',
             #'duration',
             #'ball_speed',
-            #'sender_x',
-            #'sender_y',
-            #'player_x',
-            #'player_y',
+            'sender_x',
+            'sender_y',
+            'player_x',
+            'player_y',
             'distance',
             'min_opponent_dist_to_sender_player_line',
             'second_opponent_dist_to_sender_player_line',

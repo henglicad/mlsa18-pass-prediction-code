@@ -2,6 +2,7 @@
 
 library(randomForest)
 library(caret)
+library(Hmisc)
 
 
 setwd("/Users/hengli/Projects/mlsa18-pass-prediction/src")
@@ -13,6 +14,7 @@ rawData <- read.csv("passingfeatures.tsv", sep = "\t")
 #data <- rawData[1:round(nrow(rawData)/10), ] # using a smaller data set for testing and debugging
 data <- rawData
 
+
 #######################################################################
 ##                           Pre-Modeling                            ##
 #######################################################################
@@ -20,8 +22,40 @@ data <- rawData
 response <- "label"
 data[, response] <- as.factor(data[, response]) # use classification later, thus we do as.factor here
 predictors <- names(data)[!(names(data) %in% 
-                              c("pass_id", "label", "sender_id", "player_id", "time_start"))]
+                              c("pass_id",  "line_num", "label", "sender_id", "player_id"))]
 
+#######################################################################
+##                     Correlation analysis                          ##
+#######################################################################
+explVars <- data[, predictors]
+explVarMatrix <- as.matrix(explVars)
+v <- varclus(explVarMatrix, similarity="spear", trans="abs")
+plot(v, cex = 1.0, cex.axis=1.0, cex.lab=1.0, cex.main=1.0)#, labels=labels)
+abline(h=0.2, lty=3, col = "red")#, lwd = 3) # correlation threshold: 0.8
+keptVars <- c("min_pass_angle", "abs_y_diff", "player_closest_friend_to_sender_dist",
+              "distance", "num_dangerous_opponents_along_passing_line",
+              "player_to_sender_dist_rank_among_friends", "norm_player_sender_x_diff",
+              "player_to_offense_gate_dist_rank_relative_to_friends",
+              "player_to_offense_gate_dist_rank_relative_to_opponents",
+              "player_closest_friend_dist", "is_player_goal_keeper",
+              "player_closest_opponent_dist", "is_sender_player_in_same_field",
+              "is_in_same_team", "is_sender_in_front_field",
+              "sender_team_closest_dist_to_offense_goal_line", "is_player_in_center_circle",
+              "is_player_in_middle_field", "player_to_center_distance",
+              "is_player_in_front_field", "is_player_in_back_field",
+              "player_to_offense_gate_dist", "time_start", "is_start_of_game",
+              "sender_closest_friend_dist", "sender_to_offense_gate_dist_rank_relative_to_friends",
+              "sender_closest_opponent_dist", "player_closest_3_friends_dist",
+              "is_sender_goal_keeper", "sender_to_center_distance",
+              "is_sender_in_back_field", "is_sender_in_middle_field",
+              "sender_x", "player_x", "player_y",
+              "player_to_top_sideline_dist_rank_relative_to_friends",
+              "sender_team_cloeset_dist_to_bottom_sideline",
+              "sender_team_median_dist_to_top_sideline",
+              "sender_team_closest_dist_to_top_sideline",
+              "sender_y"
+              )
+predictors <- predictors[predictors %in% keptVars]
 #######################################################################
 ##            Random Forest Modeling (10-fold cross validation)      ##
 #######################################################################
