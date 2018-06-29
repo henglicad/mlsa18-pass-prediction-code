@@ -3,7 +3,7 @@ This section discuss our overall methodology, our feature extraction, feature se
 
 \subsection{Feature extraction}
 
-In this work, we extract four dimensions of features to explain the likelihood of passing the ball to a certain target.
+In this work, we extract four dimensions of features to explain the likelihood of passing the ball to a certain target. In total, we extract 58 features. A full list of our features are available at: \todo{link to list of all features}. Section~\ref{RQ3-results} discusses the most important features for explaining the target of a pass.
 \begin{itemize}
 	\item \textbf{Sender position features.} This dimension of features capture the position of the sender on the field, such as the sender's distance to the other team's goal. We choose this dimension of features because players have different passing strategies at different positions, for example, players may pass the ball more conservatively in their own half but more aggressively in the other team's half.
 	\item \textbf{Receiver position features.} This dimension of features capture the position of a candidate receiver, such as the candidate receiver's distance to the sender. Senders always consider candidate receivers' positions when they decide the target of a pass.
@@ -18,3 +18,7 @@ In this work, we extract four dimensions of features to explain the likelihood o
 
 
 \subsection{Evaluation approaches}
+
+In each fold, we use the $top-k$ accuracy to measure the performance.
+
+We use 10-fold cross-validation to evaluate the performance of our models. 
