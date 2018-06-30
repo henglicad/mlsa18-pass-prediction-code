@@ -324,6 +324,16 @@ class Pass(object):
         ]
         return features
         
+    @staticmethod
+    def get_feature_to_index():
+        features = Pass.get_header()
+        return {feature:i for i,feature in enumerate(features)}
+        
+    @staticmethod
+    def get_index_to_feature():
+        features = Pass.get_header()
+        return {i:feature for i,feature in enumerate(features)}
+        
     def __get_min_opponent_dist_to_sender_player_line(self, player_id):
         if not self.__in_same_team(self.sender_id, player_id):
             return [-1] * 11
@@ -921,6 +931,18 @@ def cross_validation(n_folds=10):
     print("Loading data")
     headers, data = get_header_and_features(npy_file='all_features.npy')
     dir = r'./lightgbm/'
+    
+    print("All data size: %d" % len(data))
+    feature_to_index = Pass.get_feature_to_index()
+    new_data = []
+    for passes in data:
+        #if passes[0][feature_to_index['is_sender_in_back_field']] == '1':
+        #if passes[0][feature_to_index['is_sender_in_middle_field']] == '1':
+        if passes[0][feature_to_index['is_sender_in_front_field']] == '1':
+            new_data.append(passes)
+    data = np.array(new_data)
+    print("Filter data size: %d" % len(data))
+    
     all_pass_count = len(data)
     test_set_size = all_pass_count // n_folds
     feature_whitelist.extend(['pass_id', 'line_num', 'label', 'sender_id', 'player_id'])
@@ -962,12 +984,12 @@ def cross_validation(n_folds=10):
         
     with open('result.txt', 'w') as result_writer:
         result_writer.write("\nTrain results:\n")
-        for i in range(0,5):
+        for i in range(5):
             result_writer.write("Avg top-%d accuracy: %f\n" % (i+1, np.mean([acc[i] for acc in train_accs])))
         result_writer.write("Avg mean reciprocal rank: %f\n" % np.mean(train_mrr))
         
         result_writer.write("\nTest results:\n")
-        for i in range(0,5):
+        for i in range(5):
             result_writer.write("Avg top-%d accuracy: %f\n" % (i+1, np.mean([acc[i] for acc in test_accs])))
         result_writer.write("Avg mean reciprocal rank: %f\n" % np.mean(test_mrr))
         
