@@ -250,6 +250,10 @@ class Pass(object):
                 yield output_separator.join([str(feature) for feature in features])
         
     @staticmethod
+    def get_feature_start_column():
+        return 5
+        
+    @staticmethod
     def get_header():
         features = [
             'pass_id',
@@ -473,6 +477,7 @@ def get_passes():
         a_pass = pass_builder(pass_id, line_num, tokens)
         # validate
         if a_pass.sender_id not in a_pass.players: continue
+        #if (a_pass.sender_id - 14.5) * (a_pass.receiver_id - 14.5) < 0: continue
         passes.append(a_pass)
         pass_id += 1
     return passes
@@ -483,19 +488,29 @@ def featurize_one_pass(a_pass):
         output_features = [str(feature) for feature in features]
         all_features.append(output_features)
     return all_features
-        
-def featurize():
-    pool = Pool(THREAD_COUNT)
-    passes = get_passes()
-    data = pool.map(featurize_one_pass, tqdm(passes))
+    
+def get_header_and_features(shuffle=False, npy_file=''):
+    if npy_file:
+        data = np.load(npy_file)
+    else:
+        pool = Pool(THREAD_COUNT)
+        passes = get_passes()
+        if shuffle:
+            random.seed(30)
+            random.shuffle(passes)
+        data = pool.map(featurize_one_pass, tqdm(passes))
     headers = Pass.get_header()
     assert len(data[0][0]) == len(headers), 'Feature count (%d) is not the same as header count (%d)' % (len(data[0][0]), len(headers))
+    return headers, data
+    
+def featurize():
+    headers, data = get_header_and_features()
     with open('train.tsv', 'w') as train_writer, open('val.tsv', 'w') as val_writer, open('test.tsv', 'w') as test_writer:
         header_item_count = len(Pass.get_header())
         train_writer.write(output_separator.join(Pass.get_header()) + '\n')
         val_writer.write(output_separator.join(Pass.get_header()) + '\n')
         test_writer.write(output_separator.join(Pass.get_header()) + '\n')
-        counter = len(passes)
+        counter = len(data)
         print('Total valid samples count: %d' % counter)
         random.seed(30)
         #random.shuffle(passes)
@@ -515,14 +530,18 @@ def featurize():
         for feature in Pass.get_header():
             writer.write("double %s = features[i++];\n" % feature.strip())
 
+def featurize_npy():
+    headers, data = get_header_and_features(True) 
+    np.save('all_features.npy', data)
+
 def writePassingFeaturesInSingleFile():
+    headers, data = get_header_and_features()
     with open('passingfeatures.tsv', 'w') as feature_writer:
-        feature_writer.write(output_separator.join(Pass.get_header()) + '\n')
-        passes = get_passes()
-        counter = len(passes)
+        feature_writer.write(output_separator.join(headers) + '\n')
+        counter = len(data)
         for i in range(counter):
-            for feature in passes[i].features_generator():
-                feature_writer.write(feature + '\n')
+            for features in data[i]:
+                feature_writer.write(output_separator.join(features) + '\n')
 
 feature_blacklist = [
     'distance', # or 'player_closest_opponent_to_sender_dist'
@@ -561,12 +580,8 @@ feature_whitelist = [
 ]
 def featurize_svm():
     # multi-threaded version, 1.6 times faster
-    start_time = datetime.datetime.now()
-    pool = Pool(THREAD_COUNT)
-    passes = get_passes()
-    data = pool.map(featurize_one_pass, tqdm(passes))
+    headers, data = get_header_and_features()
     dir = r'./lightgbm/'
-    headers = Pass.get_header()
     feature_whitelist.extend(['pass_id', 'line_num', 'label', 'sender_id', 'player_id'])
     whitelist_ids = set([i for i, header in enumerate(headers) if header in feature_whitelist])
     assert len(data[0][0]) == len(headers), 'Feature count (%d) is not the same as header count (%d)' % (len(data[0][0]), len(headers))
@@ -578,7 +593,7 @@ def featurize_svm():
         #random.shuffle(data)
         train_counts = int(counter * 0.7)
         val_counts = int(counter * 0.1)
-        feature_start_column = 5
+        feature_start_column = Pass.get_feature_start_column()
         for i in range(counter):
             if i % 1000 == 0: print(i)
             writer = train_writer if i <= train_counts else val_writer if i <= (train_counts+val_counts) else test_writer
@@ -598,7 +613,6 @@ def featurize_svm():
                 writer.write('%s\n' % (" ".join(output_features)))
                 id_writer.write('%s\t%s\t%s\n' % (features[0], features[1], features[4])) # pass_id, line_num, receiver_id
             query_writer.write('%d\n' % len(data[i]))
-    print('Finished featurize_svm in %f seconds' % ((datetime.datetime.now() - start_time).total_seconds()))
             
 def read_lines(reader, num):
     lines = []
@@ -617,7 +631,7 @@ def lightgbm_pred_accuracy(label_file, query_file, predict_file, id_file, output
     writer = open(output_file, 'w')
     pass_lines = open(query_file).readlines()
     pass_lines = [int(count) for count in pass_lines if count.strip()]
-    reciporal_ranks = 0.0
+    reciprocal_ranks = 0.0
     for count in pass_lines:
         labels = [int(line.split()[0]) for line in read_lines(feature_reader, count)]
         results = [float(line) for line in read_lines(predict_reader, count)]
@@ -641,7 +655,7 @@ def lightgbm_pred_accuracy(label_file, query_file, predict_file, id_file, output
         #print('receiver', receiver)
         #print('top_predictions', ','.join(map(lambda x: str(x), top_predictions)))
         #print('rank', rank)
-        reciporal_ranks += 1.0 / rank
+        reciprocal_ranks += 1.0 / rank
         counter += 1
         ranked_receiver_ids = [receiver_ids[n] for n in top_predictions]
         writer.write('%s\t%s\t%s\n' % (pass_id, line_num, ",".join(ranked_receiver_ids)))
@@ -650,9 +664,10 @@ def lightgbm_pred_accuracy(label_file, query_file, predict_file, id_file, output
         topN_accuracies[i] = float(topn_correct_counters[i])/counter
         print("Top %d prediction accuracy: %d/%d = %f" % \
             (i+1, topn_correct_counters[i], counter, topN_accuracies[i]))
-    print("Mean reciporal rank: %f" % (reciporal_ranks / counter))
+    mean_reciprocal_rank = reciprocal_ranks / counter
+    print("Mean reciporal rank: %f" % mean_reciprocal_rank)
     writer.close()
-    return topN_accuracies
+    return topN_accuracies, mean_reciprocal_rank
     
 def xgboost_pred_accuracy(label_file, query_file, predict_file, id_file, output_file):
     lightgbm_pred_accuracy(label_file, query_file, predict_file, id_file, output_file)
@@ -693,7 +708,7 @@ def lightgbm_feature_importance():
     model_file = 'lightgbm/LightGBM_model.txt'
     feature_importance = False
     headers = Pass.get_header()
-    feature_start_column = 5
+    feature_start_column = Pass.get_feature_start_column()
     for line in open(model_file):
         if "feature importance" in line:
             feature_importance = True
@@ -731,9 +746,9 @@ def lightgbm_train_test_with_param(params):
     print("Predict")
     lightgbm_run('bash predict.sh')
     print("Train accuracies:")
-    train_accuracies = lightgbm_pred_accuracy('lightgbm/rank.train', 'lightgbm/rank.train.query', 'lightgbm/LightGBM_predict_train.txt', 'lightgbm/rank.train.id', 'lightgbm/rank.train.result')
+    train_accuracies, mean_reciprocal_rank = lightgbm_pred_accuracy('lightgbm/rank.train', 'lightgbm/rank.train.query', 'lightgbm/LightGBM_predict_train.txt', 'lightgbm/rank.train.id', 'lightgbm/rank.train.result')
     print("Validation accuracies:")
-    val_accuracies = lightgbm_pred_accuracy('lightgbm/rank.val', 'lightgbm/rank.val.query', 'lightgbm/LightGBM_predict_val.txt', 'lightgbm/rank.val.id', 'lightgbm/rank.val.result')
+    val_accuracies, mean_reciprocal_rank = lightgbm_pred_accuracy('lightgbm/rank.val', 'lightgbm/rank.val.query', 'lightgbm/LightGBM_predict_val.txt', 'lightgbm/rank.val.id', 'lightgbm/rank.val.result')
     print("Test accuracies:")
     lightgbm_pred_accuracy('lightgbm/rank.test', 'lightgbm/rank.test.query', 'lightgbm/LightGBM_predict_test.txt', 'lightgbm/rank.test.id', 'lightgbm/rank.test.result')
     return (train_accuracies, val_accuracies)
@@ -795,9 +810,10 @@ def model_ensemble():
     lightgbm_run('mv LightGBM_model.txt LightGBM_model_1.txt')
     lightgbm_train_test_with_param({'learning_rate': 0.05, 'min_data_in_leaf': 500, 'num_trees': 500, 'bagging_fraction': 0.5, 'feature_fraction': 1})
     lightgbm_run('mv LightGBM_model.txt LightGBM_model_2.txt')
-    #lightgbm_train_test_with_param({'learning_rate': 0.07, 'min_data_in_leaf': 50, 'num_trees': 200})
-    #lightgbm_run('mv LightGBM_model.txt LightGBM_model_3.txt')
-    model_files = ['LightGBM_model_1.txt', 'LightGBM_model_2.txt']#, 'LightGBM_model_3.txt']
+    lightgbm_train_test_with_param({'learning_rate': 0.07, 'min_data_in_leaf': 50, 'num_trees': 200})
+    lightgbm_run('mv LightGBM_model.txt LightGBM_model_3.txt')
+    model_files = ['LightGBM_model_1.txt', 'LightGBM_model_2.txt', 'LightGBM_model_3.txt']
+    #model_files = ['LightGBM_model_1.txt', 'LightGBM_model_friend.txt', 'LightGBM_model_opponent.txt']
     output_train_files = []
     output_test_files = []
     reader_train_files = []
@@ -876,9 +892,9 @@ def train_test_single_feature():
         elif USER == 'Heng':
             lightgbm_run('bash predict_heng.sh')
         print("Train accuracies:")
-        train_accuracies = lightgbm_pred_accuracy('lightgbm/rank.train', 'lightgbm/rank.train.query', 'lightgbm/LightGBM_predict_train.txt', 'lightgbm/rank.train.id', 'lightgbm/rank.train.result')
+        train_accuracies, mean_reciprocal_rank = lightgbm_pred_accuracy('lightgbm/rank.train', 'lightgbm/rank.train.query', 'lightgbm/LightGBM_predict_train.txt', 'lightgbm/rank.train.id', 'lightgbm/rank.train.result')
         print("Valid accuracies:")
-        val_accuracies = lightgbm_pred_accuracy('lightgbm/rank.val', 'lightgbm/rank.val.query', 'lightgbm/LightGBM_predict_val.txt', 'lightgbm/rank.val.id', 'lightgbm/rank.val.result')
+        val_accuracies, mean_reciprocal_rank = lightgbm_pred_accuracy('lightgbm/rank.val', 'lightgbm/rank.val.query', 'lightgbm/LightGBM_predict_val.txt', 'lightgbm/rank.val.id', 'lightgbm/rank.val.result')
         top1_val_results[i] = val_accuracies[0]
         results[i] = (train_accuracies, val_accuracies)
     writer.write('\nSorted val accuracies:\n')
@@ -887,10 +903,81 @@ def train_test_single_feature():
         writer.write('Feature %s (%d): top1_val_acc: %f, top1_train_acc: %f\n' % (feature_name, r, top1_val_results[r], results[r][0][0]))
     writer.close()
     
+def write_data_to_file_svm(data, whitelist_ids, feature_filename, query_filename, id_filename):
+    feature_start_column = Pass.get_feature_start_column()
+    with open(feature_filename, 'w') as feature_writer, open(query_filename, 'w') as query_writer, open(id_filename, 'w') as id_writer:
+        for i in range(len(data)):
+            for features in data[i]:
+                output_features = []
+                output_features.append(features[2]) # label
+                for j in range(feature_start_column, len(features)):
+                    if features[j] != 0 and j in whitelist_ids:
+                        output_features.append('%d:%s' % (j - feature_start_column + 1, features[j]))
+                feature_writer.write('%s\n' % (" ".join(output_features)))
+                id_writer.write('%s\t%s\t%s\n' % (features[0], features[1], features[4])) # pass_id, line_num, receiver_id
+            query_writer.write('%d\n' % len(data[i]))
+    
+def cross_validation(n_folds=10):
+    print("Loading data")
+    headers, data = get_header_and_features(npy_file='all_features.npy')
+    dir = r'./lightgbm/'
+    all_pass_count = len(data)
+    test_set_size = all_pass_count // n_folds
+    feature_whitelist.extend(['pass_id', 'line_num', 'label', 'sender_id', 'player_id'])
+    whitelist_ids = set([i for i, header in enumerate(headers) if header in feature_whitelist])
+    
+    train_accs = []
+    test_accs = []
+    train_mrr = []
+    test_mrr = []
+    
+    for i in range(n_folds):
+        print("\nFold number %d" % i)
+        test_set_index = range(i * test_set_size, (i+1) * test_set_size)
+        train_set_index = range(0, i * test_set_size) + range((i+1) * test_set_size, all_pass_count)
+        train_data = data[train_set_index]
+        test_data = data[test_set_index]
+        print("Train data size: %d" % len(train_data))
+        print("Test data size: %d [%d-%d]" % (len(test_data), test_set_index[0], test_set_index[-1]))
+        
+        print("Preparing train/test files")
+        write_data_to_file_svm(train_data, whitelist_ids, dir + 'rank.train', dir + 'rank.train.query', dir + 'rank.train.id')
+        write_data_to_file_svm(test_data, whitelist_ids, dir + 'rank.val', dir + 'rank.val.query', dir + 'rank.val.id')
+    
+        print("Train")
+        lightgbm_run(LIGHTGBM_EXEC + ' config=train.conf > train.log')
+        
+        print("Predict")
+        lightgbm_run('bash predict_cv.sh')
+        
+        print("Train accuracies:")
+        train_accuracies, train_mean_reciprocal_rank = lightgbm_pred_accuracy('lightgbm/rank.train', 'lightgbm/rank.train.query', 'lightgbm/LightGBM_predict_train.txt', 'lightgbm/rank.train.id', 'lightgbm/rank.train.result')
+        print("Test accuracies:")
+        test_accuracies, test_mean_reciprocal_rank = lightgbm_pred_accuracy('lightgbm/rank.val', 'lightgbm/rank.val.query', 'lightgbm/LightGBM_predict_val.txt', 'lightgbm/rank.val.id', 'lightgbm/rank.val.result')
+        
+        train_accs.append(train_accuracies)
+        test_accs.append(test_accuracies)
+        train_mrr.append(train_mean_reciprocal_rank)
+        test_mrr.append(test_mean_reciprocal_rank)
+        
+    with open('result.txt', 'w') as result_writer:
+        result_writer.write("\nTrain results:\n")
+        for i in range(0,5):
+            result_writer.write("Avg top-%d accuracy: %f\n" % (i+1, np.mean([acc[i] for acc in train_accs])))
+        result_writer.write("Avg mean reciprocal rank: %f\n" % np.mean(train_mrr))
+        
+        result_writer.write("\nTest results:\n")
+        for i in range(0,5):
+            result_writer.write("Avg top-%d accuracy: %f\n" % (i+1, np.mean([acc[i] for acc in test_accs])))
+        result_writer.write("Avg mean reciprocal rank: %f\n" % np.mean(test_mrr))
+        
 if __name__ == '__main__':
+    start_time = datetime.datetime.now()
+    
     #featurize()
     #featurize_svm()
-    writePassingFeaturesInSingleFile()
+    #featurize_npy()
+    #writePassingFeaturesInSingleFile()
     #lightgbm_pred_accuracy('lightgbm/rank.train', 'lightgbm/rank.train.query', 'lightgbm/LightGBM_predict_train.txt', 'lightgbm/rank.train.id', 'lightgbm/rank.train.result')
     #lightgbm_pred_accuracy('lightgbm/rank.test', 'lightgbm/rank.test.query', 'lightgbm/LightGBM_predict_test.txt', 'lightgbm/rank.test.id', 'lightgbm/rank.test.result')
     #lightgbm_pipeline()
@@ -902,4 +989,6 @@ if __name__ == '__main__':
     #lightgbm_python()
     #model_ensemble()
     #train_test_single_feature()
+    cross_validation(n_folds=10)
     
+    print('Finished in %s' % str(datetime.datetime.now() - start_time))
