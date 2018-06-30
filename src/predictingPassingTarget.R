@@ -108,7 +108,7 @@ predictors <- predictors[predictors %in% keptVars]
 #######################################################################
 
 # field-wise modeling
-data <- data[as.character(data$is_sender_in_front_field) == "1", ]
+#data <- data[as.character(data$is_sender_in_front_field) == "1", ]
 
 numPasses <- max(data$pass_id) + 1
 
