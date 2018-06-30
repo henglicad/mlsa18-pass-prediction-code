@@ -504,6 +504,10 @@ def featurize():
         print('Train count: %d, val count: %d, test count: %d' % (train_counts, val_counts, counter - train_counts - val_counts))
         for i in range(counter):
             if i % 1000 == 0: print(i)
+            #if i > (train_counts):
+            #    receiver_features = [features for features in data[i] if int(features[2]) == 1]
+            #    if len(receiver_features) == 0 or int(receiver_features[0][5]) == 0:
+            #        continue
             writer = train_writer if i <= train_counts else val_writer if i <= (train_counts+val_counts) else test_writer
             for features in data[i]:
                 writer.write(output_separator.join(features) + "\n")
@@ -520,6 +524,41 @@ def writePassingFeaturesInSingleFile():
             for feature in passes[i].features_generator():
                 feature_writer.write(feature + '\n')
 
+feature_blacklist = [
+    'distance', # or 'player_closest_opponent_to_sender_dist'
+    'player_to_sender_dist_rank_among_opponents', # or 'player_to_sender_dist_rank_among_friends'
+    'is_player_in_offense_direction_relative_to_sender', # or 'norm_player_sender_x_diff'
+    #'player_to_offense_gate_dist_rank_relative_to_friends', # 'player_to_offense_gate_dist_rank_relative_to_opponents'
+    'player_closest_3_friends_dist', # 'player_closest_friend_dist'
+    'player_closest_3_opponents_dist', # 'player_closest_opponent_dist'
+    'is_in_same_team', 'min_opponent_dist_to_sender_player_line', 'second_opponent_dist_to_sender_player_line', # 'third_opponent_dist_to_sender_player_line'
+    'sender_team_closest_dist_to_offense_goal_line', # ''
+]
+feature_whitelist = [
+              "min_pass_angle", "abs_y_diff", "player_closest_friend_to_sender_dist",
+              "distance", "num_dangerous_opponents_along_passing_line",
+              "player_to_sender_dist_rank_among_friends", "norm_player_sender_x_diff",
+              "player_to_offense_gate_dist_rank_relative_to_friends",
+              "player_to_offense_gate_dist_rank_relative_to_opponents",
+              "player_closest_friend_dist", "is_player_goal_keeper",
+              "player_closest_opponent_dist", #"is_sender_player_in_same_field",
+              "is_in_same_team", "is_sender_in_front_field",
+              "sender_team_closest_dist_to_offense_goal_line", "is_player_in_center_circle",
+              #"is_player_in_middle_field", 
+              "player_to_center_distance",
+              "is_player_in_front_field", "is_player_in_back_field",
+              "player_to_offense_gate_dist", "time_start", #"is_start_of_game",
+              "sender_closest_friend_dist", "sender_to_offense_gate_dist_rank_relative_to_friends",
+              "sender_closest_opponent_dist", #"player_closest_3_friends_dist",
+              "is_sender_goal_keeper", "sender_to_center_distance",
+              "is_sender_in_back_field", #"is_sender_in_middle_field",
+              #"sender_x", "player_x", "player_y",
+              "player_to_top_sideline_dist_rank_relative_to_friends",
+              "sender_team_cloeset_dist_to_bottom_sideline",
+              "sender_team_median_dist_to_top_sideline",
+              "sender_team_closest_dist_to_top_sideline",
+              #"sender_y"
+]
 def featurize_svm():
     # multi-threaded version, 1.6 times faster
     start_time = datetime.datetime.now()
@@ -528,6 +567,8 @@ def featurize_svm():
     data = pool.map(featurize_one_pass, tqdm(passes))
     dir = r'./lightgbm/'
     headers = Pass.get_header()
+    feature_whitelist.extend(['pass_id', 'line_num', 'label', 'sender_id', 'player_id'])
+    whitelist_ids = set([i for i, header in enumerate(headers) if header in feature_whitelist])
     assert len(data[0][0]) == len(headers), 'Feature count (%d) is not the same as header count (%d)' % (len(data[0][0]), len(headers))
     with open(dir + 'rank.train', 'w') as train_writer, open(dir + 'rank.train.query', 'w') as train_query_writer, open(dir + 'rank.train.id', 'w') as train_id_writer,\
          open(dir + 'rank.val', 'w') as val_writer, open(dir + 'rank.val.query', 'w') as val_query_writer, open(dir + 'rank.val.id', 'w') as val_id_writer, \
@@ -543,11 +584,15 @@ def featurize_svm():
             writer = train_writer if i <= train_counts else val_writer if i <= (train_counts+val_counts) else test_writer
             query_writer = train_query_writer if i <= train_counts else val_query_writer if i <= (train_counts+val_counts) else test_query_writer
             id_writer = train_id_writer if i <= train_counts else val_id_writer if i <= (train_counts+val_counts) else test_id_writer
+            if i >= 0:# > (train_counts):
+                receiver_features = [features for features in data[i] if int(features[2]) == 1]
+                #if len(receiver_features) == 0 or int(receiver_features[0][5]) == 1:
+                #    continue
             for features in data[i]:
                 output_features = []
                 output_features.append(features[2]) # label
                 for j in range(feature_start_column, len(features)):
-                    if features[j] != 0:
+                    if features[j] != 0 and j in whitelist_ids:
                         output_features.append('%d:%s' % (j - feature_start_column + 1, features[j]))
                         #output_features.append('%s:%s' % (headers[j], features[j]))
                 writer.write('%s\n' % (" ".join(output_features)))
@@ -572,9 +617,11 @@ def lightgbm_pred_accuracy(label_file, query_file, predict_file, id_file, output
     writer = open(output_file, 'w')
     pass_lines = open(query_file).readlines()
     pass_lines = [int(count) for count in pass_lines if count.strip()]
+    reciporal_ranks = 0.0
     for count in pass_lines:
         labels = [int(line.split()[0]) for line in read_lines(feature_reader, count)]
         results = [float(line) for line in read_lines(predict_reader, count)]
+        assert len(labels) == len(results), "len of labels and results should be same"
         id_lines = read_lines(id_reader, count)
         pass_id = id_lines[0].split('\t')[0]
         line_num = id_lines[0].split('\t')[1]
@@ -585,6 +632,16 @@ def lightgbm_pred_accuracy(label_file, query_file, predict_file, id_file, output
             topn_predictions = top_predictions[:i+1]
             if receiver in topn_predictions:
                 topn_correct_counters[i] += 1
+        rank = len(labels) - 1 # set default rank to the last
+        for i in range(len(top_predictions)):
+            if top_predictions[i] == receiver:
+                rank = i + 1
+                break
+        #print('labels', ','.join(map(lambda x: str(x), labels)))
+        #print('receiver', receiver)
+        #print('top_predictions', ','.join(map(lambda x: str(x), top_predictions)))
+        #print('rank', rank)
+        reciporal_ranks += 1.0 / rank
         counter += 1
         ranked_receiver_ids = [receiver_ids[n] for n in top_predictions]
         writer.write('%s\t%s\t%s\n' % (pass_id, line_num, ",".join(ranked_receiver_ids)))
@@ -593,6 +650,7 @@ def lightgbm_pred_accuracy(label_file, query_file, predict_file, id_file, output
         topN_accuracies[i] = float(topn_correct_counters[i])/counter
         print("Top %d prediction accuracy: %d/%d = %f" % \
             (i+1, topn_correct_counters[i], counter, topN_accuracies[i]))
+    print("Mean reciporal rank: %f" % (reciporal_ranks / counter))
     writer.close()
     return topN_accuracies
     
