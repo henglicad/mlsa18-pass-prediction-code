@@ -16,6 +16,21 @@
 \newcommand{\heng}[1]{\textcolor{blue}{{\it [Heng says: #1]}}}
 \newcommand{\todo}[1]{\textcolor{red}{\textbf{[[TODO: #1]]}}}
 
+\usepackage{fancybox}		
+\newcommand{\hypobox}[1]{\begin{center}%	
+	\noindent\thicklines\setlength{\fboxsep}{7pt}%	
+	%\cornersize{0}\Ovalbox{\begin{minipage}{3.1in}%
+	%\cornersize{0}\shadowbox{\begin{minipage}{3.1in}%	
+	%\cornersize{0}\Ovalbox{\begin{minipage}{4in}%
+	\cornersize{0}\Ovalbox{\begin{minipage}{0.96\textwidth}%	
+		%\vspace{-0.1cm}
+		%\textit{#1}
+		#1
+		%\vspace{-0.1cm}
+		\end{minipage}} \end{center}}
+
+%\usepackage{booktabs} % For formal tables
+
 
 \begin{document}
 %
