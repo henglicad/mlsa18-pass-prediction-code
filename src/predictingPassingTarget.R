@@ -14,6 +14,52 @@ rawData <- read.csv("passingfeatures.tsv", sep = "\t")
 #data <- rawData[1:round(nrow(rawData)/10), ] # using a smaller data set for testing and debugging
 data <- rawData
 
+#######################################################################
+##                         Passing pattern                           ##
+#######################################################################
+## passing accuracy
+getPassAccuracy <- function(subData) {
+  sum(as.numeric(as.character(subData$is_in_same_team)) & 
+                      as.numeric(as.character(subData$label))) / 
+  sum(as.numeric(as.character(subData$label)))
+}
+passAccuracy <- getPassAccuracy(data)
+# 0.8285738
+passAccuracyBack <- getPassAccuracy(data[as.character(data$is_sender_in_back_field)=="1", ])
+# 0.8561359
+passAccuracyMiddle <- getPassAccuracy(data[as.character(data$is_sender_in_middle_field)=="1", ])
+# 0.829286
+passAccuracyFront <- getPassAccuracy(data[as.character(data$is_sender_in_front_field)=="1", ])
+# 0.7856468
+
+## passing distance
+getPassDist <- function(subData) {
+  subData[as.character(subData$label) == "1", "distance"]
+}
+dists <- getPassDist(data)
+median(dists) # 1405.969
+distsBack <- getPassDist(data[as.character(data$is_sender_in_back_field)=="1", ])
+median(distsBack) # 1699.559
+distsMiddle <- getPassDist(data[as.character(data$is_sender_in_middle_field)=="1", ])
+median(distsMiddle) # 1394.597
+distsFront <- getPassDist(data[as.character(data$is_sender_in_front_field)=="1", ])
+median(distsFront) # 1073.825
+
+## passing forwards
+#data$is_player_in_offense_direction_relative_to_sender
+getPassForwardsRatio <- function(subData) {
+  sum(as.character(subData$label) == "1" & 
+            as.character(subData$is_player_in_offense_direction_relative_to_sender) == "1") /
+    sum(as.character(subData$label) == "1")
+}
+forwardsRatio <- getPassForwardsRatio(data)
+forwardsRatio # 0.6216573
+forwardsRatioBack <- getPassForwardsRatio(data[as.character(data$is_sender_in_back_field)=="1", ])
+forwardsRatioBack # 0.7427107
+forwardsRatioMiddle <- getPassForwardsRatio(data[as.character(data$is_sender_in_middle_field)=="1", ])
+forwardsRatioMiddle # 0.6050603
+forwardsRatioFront <- getPassForwardsRatio(data[as.character(data$is_sender_in_front_field)=="1", ])
+forwardsRatioFront # 0.4971671
 
 #######################################################################
 ##                           Pre-Modeling                            ##
@@ -38,16 +84,17 @@ keptVars <- c("min_pass_angle", "abs_y_diff", "player_closest_friend_to_sender_d
               "player_to_offense_gate_dist_rank_relative_to_friends",
               "player_to_offense_gate_dist_rank_relative_to_opponents",
               "player_closest_friend_dist", "is_player_goal_keeper",
-              "player_closest_opponent_dist", "is_sender_player_in_same_field",
+              "player_closest_opponent_dist", #"is_sender_player_in_same_field",
               "is_in_same_team", "is_sender_in_front_field",
               "sender_team_closest_dist_to_offense_goal_line", "is_player_in_center_circle",
-              "is_player_in_middle_field", "player_to_center_distance",
+              #"is_player_in_middle_field", 
+              "player_to_center_distance",
               "is_player_in_front_field", "is_player_in_back_field",
-              "player_to_offense_gate_dist", "time_start", "is_start_of_game",
+              "player_to_offense_gate_dist", "time_start", #"is_start_of_game",
               "sender_closest_friend_dist", "sender_to_offense_gate_dist_rank_relative_to_friends",
-              "sender_closest_opponent_dist", "player_closest_3_friends_dist",
+              "sender_closest_opponent_dist", #"player_closest_3_friends_dist",
               "is_sender_goal_keeper", "sender_to_center_distance",
-              "is_sender_in_back_field", "is_sender_in_middle_field",
+              "is_sender_in_back_field", #"is_sender_in_middle_field",
               "sender_x", "player_x", "player_y",
               "player_to_top_sideline_dist_rank_relative_to_friends",
               "sender_team_cloeset_dist_to_bottom_sideline",
@@ -59,6 +106,10 @@ predictors <- predictors[predictors %in% keptVars]
 #######################################################################
 ##            Random Forest Modeling (10-fold cross validation)      ##
 #######################################################################
+
+# field-wise modeling
+data <- data[as.character(data$is_sender_in_front_field) == "1", ]
+
 numPasses <- max(data$pass_id) + 1
 
 ## use pass_id instead of row idx to create 10 folds

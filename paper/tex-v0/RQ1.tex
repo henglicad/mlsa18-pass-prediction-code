@@ -1,0 +1,45 @@
+\subsection{RQ1: what are players' passing patterns?}\label{RQ1-results}
+
+\textbf{Overall, players' passing accuracy is 83\%, and the passing accuracy decreases from the back field to the front field.} 
+Table~\ref{tab:pass-statistics} shows a summary of players' passing statistics. 
+We define the passing accuracy as the ratio of the passes that pass the ball to a teammate.
+We divide the field into three equal-sized areas along the long side of the field, namely back field, middle field and front field.
+The passing accuracy for the back field, middle field, and front field is 86\%, 83\%, and 79\%, respectively.
+
+\begin{table}[!t]
+\caption{A summary of players' passing statistics.}
+\centering
+\begin{tabular}{lcccc}
+  \hline
+  & Back-field & Middle-field & Front-field & Overall \\
+  \hline
+  Passing accuracy & 86\% & 83\% & 79\% & 83\% \\
+  Median passing distance (m) & 17 & 14 & 11 & 14 \\
+  Passing forwards ratio & 74\% & 61\% & 50\% & 62\% \\
+  \hline
+\end{tabular}
+\label{tab:pass-statistics}
+\end{table}
+
+\textbf{The median passing distance is 14 meters, and the passing distance decreases from the back field to the front field.}
+Table~\ref{tab:pass-dist} shows the five-number summary of players' passing distance. While the maximum passing distance is 70 meters, 50\% of the passes are between 9 and 20 meters.
+The median passing distance for the back field, middle field, and front field is 17, 14, and 11 meters, respectively.
+
+\begin{table}[!t]
+\caption{Five-number summary of players' passing distance.}
+\centering
+\begin{tabular}{c c c c c}
+\hline
+Min. & 1st Qu. & Median & 3rd Qu. & Max. \\
+\hline
+0 & 9 & 14 & 20 & 70 \\
+\hline
+\end{tabular}
+\label{tab:pass-dist}
+\end{table}
+
+\textbf{Players pass the ball forwards in 62\% of the passes, and the ratio of forward-passing decreases from the back field to the front field.} In the back field, players pass the ball forwards in 74\% of the passes, and the ratio decreases to 61\% and 50\% in the middle field and front field, respectively.
+
+\hypobox{
+Players present different passing patterns in different areas of the field, which motivates us to extract features that capture the positions of the players in the field. Such different passing patterns also suggests us to construct and evaluate our models in different areas of the field separately.
+}
