@@ -3,10 +3,10 @@ This section discuss our overall methodology, our feature extraction, feature se
 
 \subsection{Feature extraction}
 
-In this work, we extract four dimensions of features to explain the likelihood of passing the ball to a certain target. In total, we extract 58 features. A full list of our features are available at: \todo{link to list of all features}. Section~\ref{RQ3-results} discusses the most important features for explaining the target of a pass.
+In this work, we extract four dimensions of features to explain the likelihood of passing the ball to a certain receiver. In total, we extract 58 features. A full list of our features are available at: \todo{link to list of all features}. Section~\ref{RQ3-results} discusses the most important features for explaining the receiver of a pass.
 \begin{itemize}
 	\item \textbf{Sender position features.} This dimension of features capture the position of the sender on the field, such as the sender's distance to the other team's goal. We choose this dimension of features because players have different passing strategies at different positions, for example, players may pass the ball more conservatively in their own half but more aggressively in the other team's half.
-	\item \textbf{Receiver position features.} This dimension of features capture the position of a candidate receiver, such as the candidate receiver's distance to the sender. Senders always consider candidate receivers' positions when they decide the target of a pass.
+	\item \textbf{Receiver position features.} This dimension of features capture the position of a candidate receiver, such as the candidate receiver's distance to the sender. Senders always consider candidate receivers' positions when they decide the receiver of a pass.
 	\item \textbf{Passing path features.} This dimension of features measure the quality of a passing path (i.e., the path from the sender to a candidate receiver), such as the passing angle. The quality of a passing path can predict the outcome (success/failure) of a pass.
 	\item \textbf{Team position features.} This dimension of features capture the overall position of the team in control of the ball, such as the front line of the team. Team position might also impact the passing strategy, for example, a defensive team position might be more likely to pass the ball forwards.
 \end{itemize}
@@ -19,12 +19,12 @@ In this work, we extract four dimensions of features to explain the likelihood o
 
 \subsection{Evaluation approaches}
 
-We use \textbf{\textit{top-n} accuracy} and \textbf{mean reciprocal rank (MRR)} to measure the performance of our models.
-The \textit{top-n} accuracy measures the probability that the actual target of a pass appears in the top \textit{n} predicted targets (i.e., the \textit{n} players with the highest predicted probability of being the target).
-The \textit{top-1} accuracy measures the probability that the actual target of a pass is the player with the highest predicted probability.
-The RR is the reciprocal rank of the actual target among all the players according to the predicted probability of being target.
+We use \textbf{\textit{top-N} accuracy} and \textbf{mean reciprocal rank (MRR)} to measure the performance of our models.
+\textit{Top-N} accuracy measures the probability that the actual receiver of a pass appears in the top \textit{N} predicted receivers (i.e., the \textit{N} players with the highest predicted probability of being the receiver).
+\textit{Top-1} accuracy measures the probability that the actual receiver of a pass is the player with the highest predicted probability.
+Reciprocal rank is the inverse of rank of the correct receiver in an ordered list of candidate receiver (sorted by the predicted probability of being the receiver)~\cite{Craswell2009}.
 The mean RR is the average of the reciprocal ranks over a sample of passes. The mean RR ranges from 0 to 1, the higher the better.
-%While the \textit{top-n} accuracy measures how likely the actual target appears in the top \textit{n} predicted targets, the mean RR measures the average rank of the actual targets in the predicted results.
+%While the \textit{top-N} accuracy measures how likely the actual receiver appears in the top \textit{N} predicted receivers, the mean RR measures the average rank of the actual receivers in the predicted results.
  
 We use \textbf{10-fold cross-validation} to estimate the efficacy of our models. All the passes in the dataset are randomly partitioned into 10 sets of roughly equal size. One subset is used as testing set (i.e., the held-out set) and the other nine subsets are used as training set. 
 We train our models using the training set and evaluate the performance of our models on the held-out set.
