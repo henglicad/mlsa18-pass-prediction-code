@@ -942,6 +942,7 @@ def cross_validation(n_folds=10):
         #if passes[0][feature_to_index['is_sender_in_back_field']] == '1':
         #if passes[0][feature_to_index['is_sender_in_middle_field']] == '1':
         if passes[0][feature_to_index['is_sender_in_front_field']] == '1':
+        #if True:
             new_data.append(passes)
     data = np.array(new_data)
     print("Filter data size: %d" % len(data))
@@ -952,37 +953,49 @@ def cross_validation(n_folds=10):
     whitelist_ids = set([i for i, header in enumerate(headers) if header in feature_whitelist])
     
     train_accs = []
+    val_accs = []
     test_accs = []
     train_mrr = []
+    val_mrr = []
     test_mrr = []
     
     for i in range(n_folds):
         print("\nFold number %d" % i)
         test_set_index = range(i * test_set_size, (i+1) * test_set_size)
         train_set_index = range(0, i * test_set_size) + range((i+1) * test_set_size, all_pass_count)
+        val_set_index = train_set_index[-50:] # a fixed size of 50 passes as validation set
+        train_set_index = train_set_index[:-50]
+        
         train_data = data[train_set_index]
+        val_data = data[val_set_index]
         test_data = data[test_set_index]
         print("Train data size: %d" % len(train_data))
+        print("Val data size: %d" % len(val_data))
         print("Test data size: %d [%d-%d]" % (len(test_data), test_set_index[0], test_set_index[-1]))
         
         print("Preparing train/test files")
         write_data_to_file_svm(train_data, whitelist_ids, dir + 'rank.train', dir + 'rank.train.query', dir + 'rank.train.id')
-        write_data_to_file_svm(test_data, whitelist_ids, dir + 'rank.val', dir + 'rank.val.query', dir + 'rank.val.id')
+        write_data_to_file_svm(val_data, whitelist_ids, dir + 'rank.val', dir + 'rank.val.query', dir + 'rank.val.id')
+        write_data_to_file_svm(test_data, whitelist_ids, dir + 'rank.test', dir + 'rank.test.query', dir + 'rank.test.id')
         
         print("Train")
         lightgbm_run(LIGHTGBM_EXEC + ' config=train.conf > train.log')
         
         print("Predict")
-        lightgbm_run('bash predict_cv.sh')
+        lightgbm_run('bash predict.sh')
         
         print("Train accuracies:")
         train_accuracies, train_mean_reciprocal_rank = lightgbm_pred_accuracy('lightgbm/rank.train', 'lightgbm/rank.train.query', 'lightgbm/LightGBM_predict_train.txt', 'lightgbm/rank.train.id', 'lightgbm/rank.train.result')
+        print("Val accuracies:")
+        val_accuracies, val_mean_reciprocal_rank = lightgbm_pred_accuracy('lightgbm/rank.val', 'lightgbm/rank.val.query', 'lightgbm/LightGBM_predict_val.txt', 'lightgbm/rank.val.id', 'lightgbm/rank.val.result')
         print("Test accuracies:")
-        test_accuracies, test_mean_reciprocal_rank = lightgbm_pred_accuracy('lightgbm/rank.val', 'lightgbm/rank.val.query', 'lightgbm/LightGBM_predict_val.txt', 'lightgbm/rank.val.id', 'lightgbm/rank.val.result')
+        test_accuracies, test_mean_reciprocal_rank = lightgbm_pred_accuracy('lightgbm/rank.test', 'lightgbm/rank.test.query', 'lightgbm/LightGBM_predict_test.txt', 'lightgbm/rank.test.id', 'lightgbm/rank.test.result')
         
         train_accs.append(train_accuracies)
+        val_accs.append(val_accuracies)
         test_accs.append(test_accuracies)
         train_mrr.append(train_mean_reciprocal_rank)
+        val_mrr.append(val_mean_reciprocal_rank)
         test_mrr.append(test_mean_reciprocal_rank)
         
     with open('result.txt', 'w') as result_writer:
@@ -990,6 +1003,11 @@ def cross_validation(n_folds=10):
         for i in range(5):
             result_writer.write("Avg top-%d accuracy: %f\n" % (i+1, np.mean([acc[i] for acc in train_accs])))
         result_writer.write("Avg mean reciprocal rank: %f\n" % np.mean(train_mrr))
+        
+        result_writer.write("\nVal results:\n")
+        for i in range(5):
+            result_writer.write("Avg top-%d accuracy: %f\n" % (i+1, np.mean([acc[i] for acc in val_accs])))
+        result_writer.write("Avg mean reciprocal rank: %f\n" % np.mean(val_mrr))
         
         result_writer.write("\nTest results:\n")
         for i in range(5):
