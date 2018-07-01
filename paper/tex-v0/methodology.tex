@@ -15,7 +15,17 @@ In this work, we extract four dimensions of features to explain the likelihood o
 
 \subsection{Modeling approaches}
 
+We formulate the task of predicting the receiver of a football pass as a learning to rank problem~\cite{liu2009learning}. 
+For each pass, our learning to rank model outputs a ranked list of the candidate receivers. 
+A good model should rank the correct receiver in the front of the ranked list.
 
+Gradient boosting decision tree (GBDT) is widely used for learning to rank tasks.
+There are quite a few effective implementations of GBDT, such as XGBoost and pGBRT, which usually achieves state-of-the-art performance in learning to rank tasks.
+
+In this work, we use a recent implementation of GBDT, \textbf{LightGBM}~\cite{NIPS2017_6907}, which speeds up the training time of conventional GBDT (e.g., XGBoost and pGBRT) by up to 20 times while achieving almost the same accuracy. 
+We use an open source implementation of LightGBM that is contributed by Microsoft\footnote{https://github.com/Microsoft/LightGBM}.
+
+\todo{How we train, tune, and test}
 
 \subsection{Evaluation approaches}
 
