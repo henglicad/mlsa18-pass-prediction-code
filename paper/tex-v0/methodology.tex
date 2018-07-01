@@ -1,5 +1,5 @@
 \section{Methodology} \label{methodology}
-This section discuss our overall methodology, our feature extraction, feature selection, modeling approaches, and evaluation approaches.
+This section discuss our overall methodology, including our feature extraction process, modeling and evaluation approaches.
 
 \subsection{Feature extraction}
 
@@ -11,7 +11,13 @@ In this work, we extract four dimensions of features to explain the likelihood o
 	\item \textbf{Team position features.} This dimension of features capture the overall position of the team in control of the ball, such as the front line of the team. Team position might also impact the passing strategy, for example, a defensive team position might be more likely to pass the ball forwards.
 \end{itemize}
 
-\subsection{Feature selection}
+\subsection{Removing redundant features}
+
+%In order to obtain a simpler model, 
+Redundant features usually add more complexity to the model than the information they provide to the model. Redundant features can also result in highly unstable models~\cite{kuhn2013applied}.
+In this work, we calculate the pairwise Spearman correlation between our extracted features and remove collinearity among these features.
+If the correlation between a pair of features is greater than a threshold, we only keep one of the two features in our model.
+In this work, we choose the correlation value of 0.8 as the threshold to remove collinear metrics, as suggested by prior work~\cite{kuhn2013applied}.
 
 \subsection{Modeling approaches}
 
