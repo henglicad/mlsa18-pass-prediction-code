@@ -45,3 +45,7 @@ False passes are very difficult to predict because it is not the sender player's
 \textbf{Our models perform better when the sender of a pass is in the back and front areas of the field, while perform worse when the sender is in the middle area of the field.}
 Table~\ref{tab:performance-accurate-passes} and Table~\ref{tab:performance-all-passes} also shows the performance of our models for the passes when the sender is in the back, middle and front areas of the field, separately.
 Surprisingly, the performance of our models is worst when the sender is in the middle area of the field. A player in the middle area may have more passing options, thereby increasing the difficulty to predict the right targets.
+
+\hypobox{
+Our models can predict the target of a pass with a top-1, top-3 and top-5 accuracy of 49\%, 83\%, and 94\%, respectively, when we exclude false passes. Our models perform better when the sender of a pass is in the back or front area of the field.
+}
