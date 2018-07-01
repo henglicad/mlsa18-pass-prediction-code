@@ -936,6 +936,9 @@ def cross_validation(n_folds=10):
     feature_to_index = Pass.get_feature_to_index()
     new_data = []
     for passes in data:
+        receiver_features = [features for features in passes if features[feature_to_index['label']] == '1']
+        if len(receiver_features) != 1 or receiver_features[0][feature_to_index['is_in_same_team']] == '0':
+            continue
         #if passes[0][feature_to_index['is_sender_in_back_field']] == '1':
         #if passes[0][feature_to_index['is_sender_in_middle_field']] == '1':
         if passes[0][feature_to_index['is_sender_in_front_field']] == '1':
@@ -965,7 +968,7 @@ def cross_validation(n_folds=10):
         print("Preparing train/test files")
         write_data_to_file_svm(train_data, whitelist_ids, dir + 'rank.train', dir + 'rank.train.query', dir + 'rank.train.id')
         write_data_to_file_svm(test_data, whitelist_ids, dir + 'rank.val', dir + 'rank.val.query', dir + 'rank.val.id')
-    
+        
         print("Train")
         lightgbm_run(LIGHTGBM_EXEC + ' config=train.conf > train.log')
         
