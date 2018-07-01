@@ -1,0 +1,409 @@
+
+Train results:
+Avg top-1 accuracy: 0.784855
+Avg top-2 accuracy: 0.873116
+Avg top-3 accuracy: 0.920000
+Avg top-4 accuracy: 0.948043
+Avg top-5 accuracy: 0.962971
+Avg mean reciprocal rank: 0.859238
+\Val results:
+Avg top-1 accuracy: 0.336000
+Avg top-2 accuracy: 0.574000
+Avg top-3 accuracy: 0.660000
+Avg top-4 accuracy: 0.720000
+Avg top-5 accuracy: 0.784000
+Avg mean reciprocal rank: 0.532335
+
+Test results:
+Avg top-1 accuracy: 0.439103
+Avg top-2 accuracy: 0.626923
+Avg top-3 accuracy: 0.716346
+Avg top-4 accuracy: 0.769231
+Avg top-5 accuracy: 0.815064
+Avg mean reciprocal rank: 0.605799
+
+joey@zhiyingz-x1:/mnt/c/source/github/mlsa18-pass-prediction$ python process.py
+Loading data
+All data size: 12123
+Filter data size: 3122
+
+Fold number 0
+Train data size: 2760
+Val data size: 50
+Test data size: 312 [0-311]
+Preparing train/test files
+Train
+Predict
+[LightGBM] [Info] Finished loading parameters
+[LightGBM] [Info] Finished initializing prediction, total used 500 iterations
+[LightGBM] [Info] Finished prediction
+[LightGBM] [Info] Finished loading parameters
+[LightGBM] [Info] Finished initializing prediction, total used 500 iterations
+[LightGBM] [Info] Finished prediction
+[LightGBM] [Info] Finished loading parameters
+[LightGBM] [Info] Finished initializing prediction, total used 500 iterations
+[LightGBM] [Info] Finished prediction
+Train accuracies:
+Top 1 prediction accuracy: 2176/2760 = 0.788406
+Top 2 prediction accuracy: 2421/2760 = 0.877174
+Top 3 prediction accuracy: 2559/2760 = 0.927174
+Top 4 prediction accuracy: 2624/2760 = 0.950725
+Top 5 prediction accuracy: 2663/2760 = 0.964855
+Mean reciporal rank: 0.862353
+Val accuracies:
+Top 1 prediction accuracy: 16/50 = 0.320000
+Top 2 prediction accuracy: 27/50 = 0.540000
+Top 3 prediction accuracy: 31/50 = 0.620000
+Top 4 prediction accuracy: 34/50 = 0.680000
+Top 5 prediction accuracy: 38/50 = 0.760000
+Mean reciporal rank: 0.511780
+Test accuracies:
+Top 1 prediction accuracy: 136/312 = 0.435897
+Top 2 prediction accuracy: 192/312 = 0.615385
+Top 3 prediction accuracy: 221/312 = 0.708333
+Top 4 prediction accuracy: 242/312 = 0.775641
+Top 5 prediction accuracy: 253/312 = 0.810897
+Mean reciporal rank: 0.600785
+
+Fold number 1
+Train data size: 2760
+Val data size: 50
+Test data size: 312 [312-623]
+Preparing train/test files
+Train
+Predict
+[LightGBM] [Info] Finished loading parameters
+[LightGBM] [Info] Finished initializing prediction, total used 500 iterations
+[LightGBM] [Info] Finished prediction
+[LightGBM] [Info] Finished loading parameters
+[LightGBM] [Info] Finished initializing prediction, total used 500 iterations
+[LightGBM] [Info] Finished prediction
+[LightGBM] [Info] Finished loading parameters
+[LightGBM] [Info] Finished initializing prediction, total used 500 iterations
+[LightGBM] [Info] Finished prediction
+Train accuracies:
+Top 1 prediction accuracy: 2160/2760 = 0.782609
+Top 2 prediction accuracy: 2411/2760 = 0.873551
+Top 3 prediction accuracy: 2544/2760 = 0.921739
+Top 4 prediction accuracy: 2624/2760 = 0.950725
+Top 5 prediction accuracy: 2662/2760 = 0.964493
+Mean reciporal rank: 0.858532
+Val accuracies:
+Top 1 prediction accuracy: 14/50 = 0.280000
+Top 2 prediction accuracy: 28/50 = 0.560000
+Top 3 prediction accuracy: 35/50 = 0.700000
+Top 4 prediction accuracy: 35/50 = 0.700000
+Top 5 prediction accuracy: 39/50 = 0.780000
+Mean reciporal rank: 0.502663
+Test accuracies:
+Top 1 prediction accuracy: 131/312 = 0.419872
+Top 2 prediction accuracy: 187/312 = 0.599359
+Top 3 prediction accuracy: 211/312 = 0.676282
+Top 4 prediction accuracy: 236/312 = 0.756410
+Top 5 prediction accuracy: 249/312 = 0.798077
+Mean reciporal rank: 0.586232
+
+Fold number 2
+Train data size: 2760
+Val data size: 50
+Test data size: 312 [624-935]
+Preparing train/test files
+Train
+Predict
+[LightGBM] [Info] Finished loading parameters
+[LightGBM] [Info] Finished initializing prediction, total used 500 iterations
+[LightGBM] [Info] Finished prediction
+[LightGBM] [Info] Finished loading parameters
+[LightGBM] [Info] Finished initializing prediction, total used 500 iterations
+[LightGBM] [Info] Finished prediction
+[LightGBM] [Info] Finished loading parameters
+[LightGBM] [Info] Finished initializing prediction, total used 500 iterations
+[LightGBM] [Info] Finished prediction
+Train accuracies:
+Top 1 prediction accuracy: 2167/2760 = 0.785145
+Top 2 prediction accuracy: 2412/2760 = 0.873913
+Top 3 prediction accuracy: 2535/2760 = 0.918478
+Top 4 prediction accuracy: 2610/2760 = 0.945652
+Top 5 prediction accuracy: 2656/2760 = 0.962319
+Mean reciporal rank: 0.859263
+Val accuracies:
+Top 1 prediction accuracy: 19/50 = 0.380000
+Top 2 prediction accuracy: 32/50 = 0.640000
+Top 3 prediction accuracy: 34/50 = 0.680000
+Top 4 prediction accuracy: 38/50 = 0.760000
+Top 5 prediction accuracy: 40/50 = 0.800000
+Mean reciporal rank: 0.570996
+Test accuracies:
+Top 1 prediction accuracy: 131/312 = 0.419872
+Top 2 prediction accuracy: 198/312 = 0.634615
+Top 3 prediction accuracy: 228/312 = 0.730769
+Top 4 prediction accuracy: 238/312 = 0.762821
+Top 5 prediction accuracy: 254/312 = 0.814103
+Mean reciporal rank: 0.598229
+
+Fold number 3
+Train data size: 2760
+Val data size: 50
+Test data size: 312 [936-1247]
+Preparing train/test files
+Train
+Predict
+[LightGBM] [Info] Finished loading parameters
+[LightGBM] [Info] Finished initializing prediction, total used 500 iterations
+[LightGBM] [Info] Finished prediction
+[LightGBM] [Info] Finished loading parameters
+[LightGBM] [Info] Finished initializing prediction, total used 500 iterations
+[LightGBM] [Info] Finished prediction
+[LightGBM] [Info] Finished loading parameters
+[LightGBM] [Info] Finished initializing prediction, total used 500 iterations
+[LightGBM] [Info] Finished prediction
+Train accuracies:
+Top 1 prediction accuracy: 2175/2760 = 0.788043
+Top 2 prediction accuracy: 2405/2760 = 0.871377
+Top 3 prediction accuracy: 2549/2760 = 0.923551
+Top 4 prediction accuracy: 2633/2760 = 0.953986
+Top 5 prediction accuracy: 2673/2760 = 0.968478
+Mean reciporal rank: 0.861504
+Val accuracies:
+Top 1 prediction accuracy: 14/50 = 0.280000
+Top 2 prediction accuracy: 28/50 = 0.560000
+Top 3 prediction accuracy: 34/50 = 0.680000
+Top 4 prediction accuracy: 38/50 = 0.760000
+Top 5 prediction accuracy: 40/50 = 0.800000
+Mean reciporal rank: 0.505102
+Test accuracies:
+Top 1 prediction accuracy: 121/312 = 0.387821
+Top 2 prediction accuracy: 183/312 = 0.586538
+Top 3 prediction accuracy: 215/312 = 0.689103
+Top 4 prediction accuracy: 232/312 = 0.743590
+Top 5 prediction accuracy: 253/312 = 0.810897
+Mean reciporal rank: 0.569611
+
+Fold number 4
+Train data size: 2760
+Val data size: 50
+Test data size: 312 [1248-1559]
+Preparing train/test files
+Train
+Predict
+[LightGBM] [Info] Finished loading parameters
+[LightGBM] [Info] Finished initializing prediction, total used 500 iterations
+[LightGBM] [Info] Finished prediction
+[LightGBM] [Info] Finished loading parameters
+[LightGBM] [Info] Finished initializing prediction, total used 500 iterations
+[LightGBM] [Info] Finished prediction
+[LightGBM] [Info] Finished loading parameters
+[LightGBM] [Info] Finished initializing prediction, total used 500 iterations
+[LightGBM] [Info] Finished prediction
+Train accuracies:
+Top 1 prediction accuracy: 2169/2760 = 0.785870
+Top 2 prediction accuracy: 2402/2760 = 0.870290
+Top 3 prediction accuracy: 2533/2760 = 0.917754
+Top 4 prediction accuracy: 2607/2760 = 0.944565
+Top 5 prediction accuracy: 2652/2760 = 0.960870
+Mean reciporal rank: 0.858797
+Val accuracies:
+Top 1 prediction accuracy: 17/50 = 0.340000
+Top 2 prediction accuracy: 27/50 = 0.540000
+Top 3 prediction accuracy: 31/50 = 0.620000
+Top 4 prediction accuracy: 36/50 = 0.720000
+Top 5 prediction accuracy: 39/50 = 0.780000
+Mean reciporal rank: 0.524925
+Test accuracies:
+Top 1 prediction accuracy: 139/312 = 0.445513
+Top 2 prediction accuracy: 200/312 = 0.641026
+Top 3 prediction accuracy: 234/312 = 0.750000
+Top 4 prediction accuracy: 248/312 = 0.794872
+Top 5 prediction accuracy: 264/312 = 0.846154
+Mean reciporal rank: 0.618315
+
+Fold number 5
+Train data size: 2760
+Val data size: 50
+Test data size: 312 [1560-1871]
+Preparing train/test files
+Train
+Predict
+[LightGBM] [Info] Finished loading parameters
+[LightGBM] [Info] Finished initializing prediction, total used 500 iterations
+[LightGBM] [Info] Finished prediction
+[LightGBM] [Info] Finished loading parameters
+[LightGBM] [Info] Finished initializing prediction, total used 500 iterations
+[LightGBM] [Info] Finished prediction
+[LightGBM] [Info] Finished loading parameters
+[LightGBM] [Info] Finished initializing prediction, total used 500 iterations
+[LightGBM] [Info] Finished prediction
+Train accuracies:
+Top 1 prediction accuracy: 2156/2760 = 0.781159
+Top 2 prediction accuracy: 2407/2760 = 0.872101
+Top 3 prediction accuracy: 2531/2760 = 0.917029
+Top 4 prediction accuracy: 2607/2760 = 0.944565
+Top 5 prediction accuracy: 2655/2760 = 0.961957
+Mean reciporal rank: 0.856727
+Val accuracies:
+Top 1 prediction accuracy: 20/50 = 0.400000
+Top 2 prediction accuracy: 30/50 = 0.600000
+Top 3 prediction accuracy: 32/50 = 0.640000
+Top 4 prediction accuracy: 34/50 = 0.680000
+Top 5 prediction accuracy: 38/50 = 0.760000
+Mean reciporal rank: 0.561588
+Test accuracies:
+Top 1 prediction accuracy: 134/312 = 0.429487
+Top 2 prediction accuracy: 191/312 = 0.612179
+Top 3 prediction accuracy: 216/312 = 0.692308
+Top 4 prediction accuracy: 236/312 = 0.756410
+Top 5 prediction accuracy: 251/312 = 0.804487
+Mean reciporal rank: 0.596278
+
+Fold number 6
+Train data size: 2760
+Val data size: 50
+Test data size: 312 [1872-2183]
+Preparing train/test files
+Train
+Predict
+[LightGBM] [Info] Finished loading parameters
+[LightGBM] [Info] Finished initializing prediction, total used 500 iterations
+[LightGBM] [Info] Finished prediction
+[LightGBM] [Info] Finished loading parameters
+[LightGBM] [Info] Finished initializing prediction, total used 500 iterations
+[LightGBM] [Info] Finished prediction
+[LightGBM] [Info] Finished loading parameters
+[LightGBM] [Info] Finished initializing prediction, total used 500 iterations
+[LightGBM] [Info] Finished prediction
+Train accuracies:
+Top 1 prediction accuracy: 2163/2760 = 0.783696
+Top 2 prediction accuracy: 2414/2760 = 0.874638
+Top 3 prediction accuracy: 2538/2760 = 0.919565
+Top 4 prediction accuracy: 2618/2760 = 0.948551
+Top 5 prediction accuracy: 2662/2760 = 0.964493
+Mean reciporal rank: 0.859063
+Val accuracies:
+Top 1 prediction accuracy: 15/50 = 0.300000
+Top 2 prediction accuracy: 29/50 = 0.580000
+Top 3 prediction accuracy: 31/50 = 0.620000
+Top 4 prediction accuracy: 36/50 = 0.720000
+Top 5 prediction accuracy: 40/50 = 0.800000
+Mean reciporal rank: 0.513440
+Test accuracies:
+Top 1 prediction accuracy: 132/312 = 0.423077
+Top 2 prediction accuracy: 187/312 = 0.599359
+Top 3 prediction accuracy: 221/312 = 0.708333
+Top 4 prediction accuracy: 238/312 = 0.762821
+Top 5 prediction accuracy: 255/312 = 0.817308
+Mean reciporal rank: 0.592932
+
+Fold number 7
+Train data size: 2760
+Val data size: 50
+Test data size: 312 [2184-2495]
+Preparing train/test files
+Train
+Predict
+[LightGBM] [Info] Finished loading parameters
+[LightGBM] [Info] Finished initializing prediction, total used 500 iterations
+[LightGBM] [Info] Finished prediction
+[LightGBM] [Info] Finished loading parameters
+[LightGBM] [Info] Finished initializing prediction, total used 500 iterations
+[LightGBM] [Info] Finished prediction
+[LightGBM] [Info] Finished loading parameters
+[LightGBM] [Info] Finished initializing prediction, total used 500 iterations
+[LightGBM] [Info] Finished prediction
+Train accuracies:
+Top 1 prediction accuracy: 2164/2760 = 0.784058
+Top 2 prediction accuracy: 2425/2760 = 0.878623
+Top 3 prediction accuracy: 2544/2760 = 0.921739
+Top 4 prediction accuracy: 2611/2760 = 0.946014
+Top 5 prediction accuracy: 2648/2760 = 0.959420
+Mean reciporal rank: 0.859655
+Val accuracies:
+Top 1 prediction accuracy: 15/50 = 0.300000
+Top 2 prediction accuracy: 26/50 = 0.520000
+Top 3 prediction accuracy: 32/50 = 0.640000
+Top 4 prediction accuracy: 36/50 = 0.720000
+Top 5 prediction accuracy: 39/50 = 0.780000
+Mean reciporal rank: 0.502358
+Test accuracies:
+Top 1 prediction accuracy: 158/312 = 0.506410
+Top 2 prediction accuracy: 216/312 = 0.692308
+Top 3 prediction accuracy: 239/312 = 0.766026
+Top 4 prediction accuracy: 246/312 = 0.788462
+Top 5 prediction accuracy: 255/312 = 0.817308
+Mean reciporal rank: 0.655632
+
+Fold number 8
+Train data size: 2760
+Val data size: 50
+Test data size: 312 [2496-2807]
+Preparing train/test files
+Train
+Predict
+[LightGBM] [Info] Finished loading parameters
+[LightGBM] [Info] Finished initializing prediction, total used 500 iterations
+[LightGBM] [Info] Finished prediction
+[LightGBM] [Info] Finished loading parameters
+[LightGBM] [Info] Finished initializing prediction, total used 500 iterations
+[LightGBM] [Info] Finished prediction
+[LightGBM] [Info] Finished loading parameters
+[LightGBM] [Info] Finished initializing prediction, total used 500 iterations
+[LightGBM] [Info] Finished prediction
+Train accuracies:
+Top 1 prediction accuracy: 2165/2760 = 0.784420
+Top 2 prediction accuracy: 2392/2760 = 0.866667
+Top 3 prediction accuracy: 2527/2760 = 0.915580
+Top 4 prediction accuracy: 2615/2760 = 0.947464
+Top 5 prediction accuracy: 2653/2760 = 0.961232
+Mean reciporal rank: 0.857364
+Val accuracies:
+Top 1 prediction accuracy: 16/50 = 0.320000
+Top 2 prediction accuracy: 28/50 = 0.560000
+Top 3 prediction accuracy: 33/50 = 0.660000
+Top 4 prediction accuracy: 35/50 = 0.700000
+Top 5 prediction accuracy: 39/50 = 0.780000
+Mean reciporal rank: 0.520729
+Test accuracies:
+Top 1 prediction accuracy: 157/312 = 0.503205
+Top 2 prediction accuracy: 213/312 = 0.682692
+Top 3 prediction accuracy: 227/312 = 0.727564
+Top 4 prediction accuracy: 242/312 = 0.775641
+Top 5 prediction accuracy: 256/312 = 0.820513
+Mean reciporal rank: 0.647960
+
+Fold number 9
+Train data size: 2760
+Val data size: 50
+Test data size: 312 [2808-3119]
+Preparing train/test files
+Train
+Predict
+[LightGBM] [Info] Finished loading parameters
+[LightGBM] [Info] Finished initializing prediction, total used 500 iterations
+[LightGBM] [Info] Finished prediction
+[LightGBM] [Info] Finished loading parameters
+[LightGBM] [Info] Finished initializing prediction, total used 500 iterations
+[LightGBM] [Info] Finished prediction
+[LightGBM] [Info] Finished loading parameters
+[LightGBM] [Info] Finished initializing prediction, total used 500 iterations
+[LightGBM] [Info] Finished prediction
+Train accuracies:
+Top 1 prediction accuracy: 2167/2760 = 0.785145
+Top 2 prediction accuracy: 2409/2760 = 0.872826
+Top 3 prediction accuracy: 2532/2760 = 0.917391
+Top 4 prediction accuracy: 2617/2760 = 0.948188
+Top 5 prediction accuracy: 2654/2760 = 0.961594
+Mean reciporal rank: 0.859123
+Val accuracies:
+Top 1 prediction accuracy: 22/50 = 0.440000
+Top 2 prediction accuracy: 32/50 = 0.640000
+Top 3 prediction accuracy: 37/50 = 0.740000
+Top 4 prediction accuracy: 38/50 = 0.760000
+Top 5 prediction accuracy: 40/50 = 0.800000
+Mean reciporal rank: 0.609772
+Test accuracies:
+Top 1 prediction accuracy: 131/312 = 0.419872
+Top 2 prediction accuracy: 189/312 = 0.605769
+Top 3 prediction accuracy: 223/312 = 0.714744
+Top 4 prediction accuracy: 242/312 = 0.775641
+Top 5 prediction accuracy: 253/312 = 0.810897
+Mean reciporal rank: 0.592011
+Finished in 0:02:47.792729
