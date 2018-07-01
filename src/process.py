@@ -846,9 +846,10 @@ def model_ensemble():
     avg_pred_results(reader_train_files, avg_train_outfile)
     avg_pred_results(reader_test_files, avg_test_outfile)
     print("Train accuracies:")
-    lightgbm_pred_accuracy('lightgbm/rank.train', 'lightgbm/rank.train.query', avg_train_outfile, 'lightgbm/rank.train.id', 'lightgbm/rank.train.result')
+    train_accuracies, train_mean_reciprocal_rank = lightgbm_pred_accuracy('lightgbm/rank.train', 'lightgbm/rank.train.query', avg_train_outfile, 'lightgbm/rank.train.id', 'lightgbm/rank.train.result')
     print("Test accuracies:")
-    lightgbm_pred_accuracy('lightgbm/rank.test', 'lightgbm/rank.test.query', avg_test_outfile, 'lightgbm/rank.test.id', 'lightgbm/rank.test.result')
+    test_accuracies, test_mean_reciprocal_rank = lightgbm_pred_accuracy('lightgbm/rank.test', 'lightgbm/rank.test.query', avg_test_outfile, 'lightgbm/rank.test.id', 'lightgbm/rank.test.result')
+    return (train_accuracies, train_mean_reciprocal_rank, test_accuracies, test_mean_reciprocal_rank)
     
 def lightgbm_python():
     X_train, y_train = load_svmlight_file('lightgbm/rank.train')
@@ -902,9 +903,9 @@ def train_test_single_feature():
         elif USER == 'Heng':
             lightgbm_run('bash predict_heng.sh')
         print("Train accuracies:")
-        train_accuracies, mean_reciprocal_rank = lightgbm_pred_accuracy('lightgbm/rank.train', 'lightgbm/rank.train.query', 'lightgbm/LightGBM_predict_train.txt', 'lightgbm/rank.train.id', 'lightgbm/rank.train.result')
+        train_accuracies, train_mean_reciprocal_rank = lightgbm_pred_accuracy('lightgbm/rank.train', 'lightgbm/rank.train.query', 'lightgbm/LightGBM_predict_train.txt', 'lightgbm/rank.train.id', 'lightgbm/rank.train.result')
         print("Valid accuracies:")
-        val_accuracies, mean_reciprocal_rank = lightgbm_pred_accuracy('lightgbm/rank.val', 'lightgbm/rank.val.query', 'lightgbm/LightGBM_predict_val.txt', 'lightgbm/rank.val.id', 'lightgbm/rank.val.result')
+        val_accuracies, val_mean_reciprocal_rank = lightgbm_pred_accuracy('lightgbm/rank.val', 'lightgbm/rank.val.query', 'lightgbm/LightGBM_predict_val.txt', 'lightgbm/rank.val.id', 'lightgbm/rank.val.result')
         top1_val_results[i] = val_accuracies[0]
         results[i] = (train_accuracies, val_accuracies)
     writer.write('\nSorted val accuracies:\n')
@@ -927,7 +928,7 @@ def write_data_to_file_svm(data, whitelist_ids, feature_filename, query_filename
                 id_writer.write('%s\t%s\t%s\n' % (features[0], features[1], features[4])) # pass_id, line_num, receiver_id
             query_writer.write('%d\n' % len(data[i]))
     
-def cross_validation(n_folds=10):
+def cross_validation(n_folds=10, use_model_ensemble=False):
     print("Loading data")
     headers, data = get_header_and_features(npy_file='all_features.npy')
     dir = r'./lightgbm/'
@@ -978,24 +979,27 @@ def cross_validation(n_folds=10):
         write_data_to_file_svm(val_data, whitelist_ids, dir + 'rank.val', dir + 'rank.val.query', dir + 'rank.val.id')
         write_data_to_file_svm(test_data, whitelist_ids, dir + 'rank.test', dir + 'rank.test.query', dir + 'rank.test.id')
         
-        print("Train")
-        lightgbm_run(LIGHTGBM_EXEC + ' config=train.conf > train.log')
-        
-        print("Predict")
-        lightgbm_run('bash predict.sh')
-        
-        print("Train accuracies:")
-        train_accuracies, train_mean_reciprocal_rank = lightgbm_pred_accuracy('lightgbm/rank.train', 'lightgbm/rank.train.query', 'lightgbm/LightGBM_predict_train.txt', 'lightgbm/rank.train.id', 'lightgbm/rank.train.result')
-        print("Val accuracies:")
-        val_accuracies, val_mean_reciprocal_rank = lightgbm_pred_accuracy('lightgbm/rank.val', 'lightgbm/rank.val.query', 'lightgbm/LightGBM_predict_val.txt', 'lightgbm/rank.val.id', 'lightgbm/rank.val.result')
-        print("Test accuracies:")
-        test_accuracies, test_mean_reciprocal_rank = lightgbm_pred_accuracy('lightgbm/rank.test', 'lightgbm/rank.test.query', 'lightgbm/LightGBM_predict_test.txt', 'lightgbm/rank.test.id', 'lightgbm/rank.test.result')
+        if use_model_ensemble:
+            train_accuracies, train_mean_reciprocal_rank, test_accuracies, test_mean_reciprocal_rank = model_ensemble()
+        else:
+            print("Train")
+            lightgbm_run(LIGHTGBM_EXEC + ' config=train.conf > train.log')
+            
+            print("Predict")
+            lightgbm_run('bash predict.sh')
+            
+            print("Train accuracies:")
+            train_accuracies, train_mean_reciprocal_rank = lightgbm_pred_accuracy('lightgbm/rank.train', 'lightgbm/rank.train.query', 'lightgbm/LightGBM_predict_train.txt', 'lightgbm/rank.train.id', 'lightgbm/rank.train.result')
+            print("Val accuracies:")
+            val_accuracies, val_mean_reciprocal_rank = lightgbm_pred_accuracy('lightgbm/rank.val', 'lightgbm/rank.val.query', 'lightgbm/LightGBM_predict_val.txt', 'lightgbm/rank.val.id', 'lightgbm/rank.val.result')
+            print("Test accuracies:")
+            test_accuracies, test_mean_reciprocal_rank = lightgbm_pred_accuracy('lightgbm/rank.test', 'lightgbm/rank.test.query', 'lightgbm/LightGBM_predict_test.txt', 'lightgbm/rank.test.id', 'lightgbm/rank.test.result')
         
         train_accs.append(train_accuracies)
-        val_accs.append(val_accuracies)
+        #val_accs.append(val_accuracies)
         test_accs.append(test_accuracies)
         train_mrr.append(train_mean_reciprocal_rank)
-        val_mrr.append(val_mean_reciprocal_rank)
+        #val_mrr.append(val_mean_reciprocal_rank)
         test_mrr.append(test_mean_reciprocal_rank)
         
     with open('result.txt', 'w') as result_writer:
@@ -1004,10 +1008,10 @@ def cross_validation(n_folds=10):
             result_writer.write("Avg top-%d accuracy: %f\n" % (i+1, np.mean([acc[i] for acc in train_accs])))
         result_writer.write("Avg mean reciprocal rank: %f\n" % np.mean(train_mrr))
         
-        result_writer.write("\nVal results:\n")
-        for i in range(5):
-            result_writer.write("Avg top-%d accuracy: %f\n" % (i+1, np.mean([acc[i] for acc in val_accs])))
-        result_writer.write("Avg mean reciprocal rank: %f\n" % np.mean(val_mrr))
+        #result_writer.write("\nVal results:\n")
+        #for i in range(5):
+        #    result_writer.write("Avg top-%d accuracy: %f\n" % (i+1, np.mean([acc[i] for acc in val_accs])))
+        #result_writer.write("Avg mean reciprocal rank: %f\n" % np.mean(val_mrr))
         
         result_writer.write("\nTest results:\n")
         for i in range(5):
@@ -1032,6 +1036,7 @@ if __name__ == '__main__':
     #lightgbm_python()
     #model_ensemble()
     #train_test_single_feature()
-    cross_validation(n_folds=10)
+    cross_validation(n_folds=10, use_model_ensemble=True)
+    #cross_validation(n_folds=10, use_model_ensemble=False)
     
     print('Finished in %s' % str(datetime.datetime.now() - start_time))
