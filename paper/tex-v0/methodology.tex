@@ -33,6 +33,9 @@ We use an open source implementation of LightGBM that is contributed by Microsof
 
 \todo{How we train, tune, and test}
 
+\todo{Please help refine the language}
+We use a 10-fold cross-validation approach to train and test the model. For each fold, we hold out 10\% of the data as test set. For the first fold, we continue to split the data into training and validation data, then we do a grid search to get the top three set of parameters according to the validation set performance. Then for each fold, we train three models with these three set of hyperparameters \todo{list all the hyperparameters} on the training data. On test data, we use the three models to predict to get three sets of result, and then average the prediction results for each candidate, then use the averaged result to do ranking. We find that with model ensembling, all the accuracy numbers improve about 0.1\%\~2.0\%.
+
 \subsection{Evaluation approaches}
 
 We use \textbf{\textit{top-N} accuracy} and \textbf{mean reciprocal rank (MRR)} to measure the performance of our models.

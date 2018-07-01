@@ -1,8 +1,8 @@
 \subsection{RQ2: how well can we model the receiver of a pass?}\label{RQ2-results}
 
-\textbf{Our models can predict the receiver of a pass with a top-1 accuracy of 49\% and a top-5 accuracy of 94\%, when we exclude false passes (i.e., passes to the other team).}
+\textbf{Our models can predict the receiver of a pass with a top-1 accuracy of 50\% and a top-5 accuracy of 94\%, when we exclude false passes (i.e., passes to the other team).}
 Table~\ref{tab:performance-accurate-passes} shows the performance of our models in terms of \textit{top-N} accuracy when we exclude false passes. 
-The top-1, top-3, and top-5 accuracy is 49\%, 83\%, and 94\%, respectively, which means the actual receiver of a pass has a 94\% chance of being within our top-5 predicted candidates.
+The top-1, top-3, and top-5 accuracy is 50\%, 84\%, and 94\%, respectively, which means the actual receiver of a pass has a 94\% chance of being within our top-5 predicted candidates.
 
 \begin{table}[!t]
 \caption{The accuracy of our models for predicting the receiver of a pass (excluding false passes).}
@@ -11,10 +11,10 @@ The top-1, top-3, and top-5 accuracy is 49\%, 83\%, and 94\%, respectively, whic
   \hline
   & Back-field & Middle-field & Front-field & Overall \\
   \hline
-  Top-1 accuracy & 52\% & 45\% & 53\% & 49\% \\
-  Top-3 accuracy & 83\% & 81\% & 90\% & 83\% \\
+  Top-1 accuracy & 53\% & 46\% & 55\% & 50\% \\
+  Top-3 accuracy & 84\% & 81\% & 91\% & 84\% \\
   Top-5 accuracy & 93\% & 93\% & 97\% & 94\% \\
-  MRR & 0.69 & 0.65 & 0.72 & 0.68 \\
+  MRR & 0.70 & 0.66 & 0.73 & 0.68 \\
   \hline
 \end{tabular}
 \label{tab:performance-accurate-passes}
@@ -32,9 +32,9 @@ False passes are very difficult to predict because it is not the sender player's
   \hline
   & Back-field & Middle-field & Front-field & Overall \\
   \hline
-  Top-1 accuracy & 44\% & 37\% & 42\% & 41\% \\
-  Top-3 accuracy & 72\% & 68\% & 71\% & 70\% \\
-  Top-5 accuracy & 82\% & 80\% & 81\% & 81\% \\
+  Top-1 accuracy & 45\% & 38\% & 43\% & 41\% \\
+  Top-3 accuracy & 72\% & 68\% & 72\% & 70\% \\
+  Top-5 accuracy & 82\% & 80\% & 83\% & 81\% \\
   MRR & 0.61 & 0.56 & 0.60 & 0.58 \\
   \hline
 \end{tabular}
@@ -46,5 +46,5 @@ Table~\ref{tab:performance-accurate-passes} and Table~\ref{tab:performance-all-p
 Surprisingly, the performance of our models is worst when the sender is in the middle area of the field. A player in the middle area may have more passing options, thereby increasing the difficulty to predict the right receivers.
 
 \hypobox{
-Our models can predict the receiver of a pass with a top-1, top-3 and top-5 accuracy of 49\%, 83\%, and 94\%, respectively, when we exclude false passes. Our models perform better when the sender of a pass is in the back or front area of the field.
+Our models can predict the receiver of a pass with a top-1, top-3 and top-5 accuracy of 50\%, 84\%, and 94\%, respectively, when we exclude false passes. Our models perform better when the sender of a pass is in the back or front area of the field.
 }
