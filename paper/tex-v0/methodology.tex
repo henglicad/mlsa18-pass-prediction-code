@@ -3,21 +3,23 @@ This section discuss our overall methodology, including our feature extraction p
 
 \subsection{Feature extraction}
 
-In this work, we extract four dimensions of features to explain the likelihood of passing the ball to a certain receiver. In total, we extract 58 features. A full list of our features are available at: \todo{link to list of all features}. Section~\ref{RQ3-results} discusses the most important features for explaining the receiver of a pass.
+From the dataset that contains information about 12,124 passes\footnotemark[\ref{origin_dataset}], we extract five dimensions of features to explain the likelihood of passing the ball to a certain receiver. In total, we extract 54 features. A full list of our features is available at our public git repository\footnote{\label{feature-list}https://github.com/henglicad/mlsa18-pass-prediction/blob/master/feature-list.md}. 
+We also share our extracted feature values online~\footnote{\label{feature-values}}.
+%Section~\ref{RQ3-results} discusses the most important features for explaining the receiver of a pass.
 \begin{itemize}
 	\item \textbf{Sender position features.} This dimension of features capture the position of the sender on the field, such as the sender's distance to the other team's goal. We choose this dimension of features because players have different passing strategies at different positions, for example, players may pass the ball more conservatively in their own half but more aggressively in the other team's half.
-	\item \textbf{Receiver position features.} This dimension of features capture the position of a candidate receiver, such as the candidate receiver's distance to the sender. Senders always consider candidate receivers' positions when they decide the receiver of a pass.
+	\item \textbf{Candidate receiver position features.} This dimension of features capture the position of a candidate receiver, such as the candidate receiver's distance to the sender. Senders always consider candidate receivers' positions when they decide the receiver of a pass.
 	\item \textbf{Passing path features.} This dimension of features measure the quality of a passing path (i.e., the path from the sender to a candidate receiver), such as the passing angle. The quality of a passing path can predict the outcome (success/failure) of a pass.
 	\item \textbf{Team position features.} This dimension of features capture the overall position of the team in control of the ball, such as the front line of the team. Team position might also impact the passing strategy, for example, a defensive team position might be more likely to pass the ball forwards.
+	\item \textbf{Game state features.} This dimension of feature capture the state of the whole game, such as the time when the sender passes the ball. \textbf{We do not use the time when the receiver receives the ball as a feature in our model, as it exposes information about the actual pass (e.g., pass duration).}
 \end{itemize}
 
-\subsection{Removing redundant features}
+%\subsection{Removing redundant features}
 
-%In order to obtain a simpler model, 
-Redundant features usually add more complexity to the model than the information they provide to the model. Redundant features can also result in highly unstable models~\cite{kuhn2013applied}.
-In this work, we calculate the pairwise Spearman correlation between our extracted features and remove collinearity among these features.
-If the correlation between a pair of features is greater than a threshold, we only keep one of the two features in our model.
-In this work, we choose the correlation value of 0.8 as the threshold to remove collinear metrics, as suggested by prior work~\cite{kuhn2013applied}.
+%Redundant features usually add more complexity to the model than the information they provide to the model. Redundant features can also result in highly unstable models~\cite{kuhn2013applied}.
+%In this work, we calculate the pairwise Spearman correlation between our extracted features and remove collinearity among these features.
+%If the correlation between a pair of features is greater than a threshold, we only keep one of the two features in our model.
+%In this work, we choose the correlation value of 0.8 as the threshold to remove collinear metrics, as suggested by prior work~\cite{kuhn2013applied}.
 
 \subsection{Modeling approach}
 
