@@ -1,0 +1,75 @@
+Train accuracies:
+Top 1 prediction accuracy: 6275/10861 = 0.577755
+Top 2 prediction accuracy: 7554/10861 = 0.695516
+Top 3 prediction accuracy: 8371/10861 = 0.770739
+Top 4 prediction accuracy: 8915/10861 = 0.820827
+Top 5 prediction accuracy: 9330/10861 = 0.859037
+Mean reciporal rank: 0.698525
+Validation accuracies:
+Top 1 prediction accuracy: 20/50 = 0.400000
+Top 2 prediction accuracy: 28/50 = 0.560000
+Top 3 prediction accuracy: 35/50 = 0.700000
+Top 4 prediction accuracy: 37/50 = 0.740000
+Top 5 prediction accuracy: 39/50 = 0.780000
+Mean reciporal rank: 0.566238
+Test accuracies:
+Top 1 prediction accuracy: 500/1212 = 0.412541
+Top 2 prediction accuracy: 734/1212 = 0.605611
+Top 3 prediction accuracy: 860/1212 = 0.709571
+Top 4 prediction accuracy: 934/1212 = 0.770627
+Top 5 prediction accuracy: 986/1212 = 0.813531
+Mean reciporal rank: 0.589128
+player_closest_opponent_dist=715
+norm_player_sender_x_diff=660
+abs_y_diff=653
+distance=616
+player_closest_opponent_to_sender_dist=602
+player_closest_3_opponents_dist=558
+player_to_center_distance=521
+player_closest_3_friends_dist=508
+sender_closest_opponent_dist=498
+min_pass_angle=467
+player_to_defense_gate_dist=457
+min_opponent_dist_to_sender_player_line=450
+sender_to_center_distance=445
+player_closest_friend_dist=438
+player_to_offense_gate_dist=421
+player_closest_friend_to_sender_dist=419
+sender_closest_3_friends_dist=409
+third_opponent_dist_to_sender_player_line=377
+sender_closest_3_opponents_dist=371
+sender_team_cloeset_dist_to_bottom_sideline=366
+second_opponent_dist_to_sender_player_line=356
+sender_team_closest_dist_to_top_sideline=348
+time_start=340
+player_to_offense_gate_dist_rank_relative_to_friends=328
+sender_to_offense_gate_dist=320
+sender_team_median_dist_to_top_sideline=317
+sender_closest_friend_dist=316
+sender_to_defense_gate_dist=300
+sender_team_closest_dist_to_offense_goal_line=276
+sender_team_median_dist_to_offense_goal_line=254
+sender_team_closest_dist_to_defense_goal_line_exclude_goalie=245
+player_to_offense_gate_dist_rank_relative_to_opponents=238
+player_to_sender_dist_rank_among_friends=179
+player_to_top_sideline_dist_rank_relative_to_opponents=166
+player_to_sender_dist_rank_among_opponents=159
+player_to_top_sideline_dist_rank_relative_to_friends=157
+sender_to_offense_gate_dist_rank_relative_to_opponents=143
+sender_to_offense_gate_dist_rank_relative_to_friends=127
+num_dangerous_opponents_along_passing_line=103
+sender_to_top_sideline_dist_rank_relative_to_friends=101
+sender_to_top_sideline_dist_rank_relative_to_opponents=89
+is_player_in_offense_direction_relative_to_sender=47
+is_in_same_team=34
+is_player_goal_keeper=20
+is_sender_player_in_same_field=19
+is_sender_goal_keeper=17
+is_player_in_middle_field=13
+is_player_in_center_circle=10
+is_sender_in_middle_field=8
+is_player_in_back_field=6
+is_player_in_front_field=6
+is_start_of_game=3
+is_sender_in_front_field=2
+is_sender_in_back_field=2
