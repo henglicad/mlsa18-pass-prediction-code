@@ -69,7 +69,7 @@
 - **receiver_to_sender_dist_rank_among_teammates**: the rank of the distance to the sender for the candidate receiver among all receiver's teammates.
 - **receiver_to_sender_dist_rank_among_opponents**: the rank of the distance to the sender for the candidate receiver among all receiver's opponents.
 
-## Feature Importance List
+## Feature Importance Output From LightGBM
 
 **Feature** | **Importance**
 :-- | :--
@@ -127,3 +127,62 @@ is_receiver_in_front_field | 6
 is_start_of_game | 3
 is_sender_in_front_field | 2
 is_sender_in_back_field | 2
+
+## Per Feature Training Accuracy
+
+**Feature** | **Top-1 test accuracy**
+:-- | :--
+receiver_closest_teammate_to_sender_dist | 0.245050
+receiver_closest_opponent_to_sender_dist | 0.204620
+third_opponent_dist_to_sender_receiver_line | 0.204620
+second_opponent_dist_to_sender_receiver_line | 0.194719
+min_opponent_dist_to_sender_receiver_line | 0.172442
+distance | 0.139439
+min_pass_angle | 0.132838
+receiver_to_sender_dist_rank_among_frends | 0.122112
+norm_receiver_sender_x_diff | 0.112211
+receiver_to_top_sideline_dist_rank_relative_to_opponents | 0.106436
+receiver_closest_opponent_dist | 0.098185
+num_dangerous_opponents_along_passing_line | 0.096535
+receiver_to_offense_gate_dist_rank_relative_to_opponents | 0.090759
+receiver_to_sender_dist_rank_among_opponents | 0.089109
+receiver_to_defense_gate_dist | 0.076733
+abs_y_diff | 0.076733
+receiver_to_center_distance | 0.075908
+receiver_closest_3_opponents_dist | 0.074257
+receiver_to_offense_gate_dist | 0.072607
+is_sender_receiver_in_same_field | 0.068482
+is_in_same_team | 0.067657
+is_receiver_in_offense_direction_relative_to_sender | 0.062706
+receiver_to_offense_gate_dist_rank_relative_to_teammates | 0.056931
+receiver_closest_teammate_dist | 0.056106
+receiver_closest_3_teammates_dist | 0.052805
+is_receiver_in_front_field | 0.051980
+receiver_to_top_sideline_dist_rank_relative_to_teammates | 0.046205
+is_receiver_in_back_field | 0.040429
+time_start | 0.038779
+is_sender_in_back_field | 0.038779
+is_sender_in_middle_field | 0.038779
+is_sender_in_front_field | 0.038779
+sender_to_offense_gate_dist | 0.038779
+sender_to_defense_gate_dist | 0.038779
+is_start_of_game | 0.038779
+sender_to_center_distance | 0.038779
+is_sender_goal_keeper | 0.038779
+is_receiver_goal_keeper | 0.038779
+sender_closest_teammate_dist | 0.038779
+sender_closest_3_teammates_dist | 0.038779
+sender_closest_opponent_dist | 0.038779
+sender_closest_3_opponents_dist | 0.038779
+sender_to_offense_gate_dist_rank_relative_to_teammates | 0.038779
+sender_to_offense_gate_dist_rank_relative_to_opponents | 0.038779
+sender_to_top_sideline_dist_rank_relative_to_teammates | 0.038779
+sender_to_top_sideline_dist_rank_relative_to_opponents | 0.038779
+sender_team_closest_dist_to_offense_goal_line | 0.038779
+sender_team_closest_dist_to_defense_goal_line_exclude_goalie | 0.038779
+sender_team_closest_dist_to_top_sideline | 0.038779
+sender_team_cloeset_dist_to_bottom_sideline | 0.038779
+sender_team_median_dist_to_offense_goal_line | 0.038779
+sender_team_median_dist_to_top_sideline | 0.038779
+is_receiver_in_center_circle | 0.035479
+is_receiver_in_middle_field | 0.033828
