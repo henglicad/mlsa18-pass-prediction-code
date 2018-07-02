@@ -3,7 +3,7 @@
 ## Game State Features
 
 - **time_start**: time elapsed since the start of the half at the time the ball was passed by the sender.
-- **is_start_of_game**: is it the start of a half of the game.
+- **is_start_of_game**: is it the start of any half of the game.
 
 ## Sender Position Features
 
@@ -39,20 +39,32 @@
 - **receiver_closest_3_teammates_dist**: the average distance between the candidate receiver and his/her three closest teammates.
 - **receiver_closest_opponent_dist**: the distance between the candidate receiver and his/her closest opponent.
 - **receiver_closest_3_opponents_dist**: the average distance between the candidate receiver and his/her three closest opponents.
+- **receiver_closest_teammate_to_sender_dist**: the distance between the sender and the candidate receiver's closest teammate.
+- **receiver_closest_opponent_to_sender_dist**: the distance between the sender and the candidate receiver's closest opponent. 
 
 ## Passing Path Features
 
 - **min_opponent_dist_to_sender_receiver_line**: the minimum distance an opponent has to the passing line drawn between the sender and the candidate receiver. If the sender and the candidate receiver is not in the same team, this is set to -1. The assumption is that if there is an opponent too close to the passing line, then this receiver might not be a good candidate.
 - **second_opponent_dist_to_sender_receiver_line**: similar to above, change from minimum to second minimum.
 - **third_opponent_dist_to_sender_receiver_line**: similar to above, change from minimum to third minimum.
+- **num_dangerous_opponents_along_passing_line**: number of dangerous opponents along the passing line. We define dangerous opponents as the following: an opponent whose distance to the sender and that to the candidate receiver are both less than the distance between the sender and the candiate receiver.
+- **min_pass_angle**: We define the pass angle as the following: for a given set of (sender, receiver, opponent), the pass angle is the angle between the sender to receiver line and sender to opponent line. The *min_pass_angle* is the minimum pass angle among all the dangerous opponents along the sender to candidate receiver passing line.
 
 ## Team Position Features
 
-- **sender_to_offense_gate_dist_rank_relative_to_teammates**:  the rank of the distance to the offense gate for the sender among all teammates. This depicts the relative position of the sender in the team to the offense gate.
+- **sender_to_offense_gate_dist_rank_relative_to_teammates**:  the rank of the distance to the offense gate for the sender among all teammates. This depicts the relative position of the sender in the team to the offense gate. The offense gate is defined as the point (5250, 0) if sender is in the left team (i.e. the average x for all players in sender's team is less than 0), and the point (-5250, 0) if sender is in the right team.
 - **sender_to_offense_gate_dist_rank_relative_to_opponents**: similar to above, the rank is for the sender among all opponents instead.
-- **sender_to_top_sideline_dist_rank_relative_to_teammates**: the rank of the distance to the top sideline for the sender among all teammates. This depicts the relative position of the sender in the team to the top sideline.
+- **sender_to_top_sideline_dist_rank_relative_to_teammates**: the rank of the distance to the top sideline for the sender among all teammates. This depicts the relative position of the sender in the team to the top sideline. The top sideline is defined as the y=3400 line.
 - **sender_to_top_sideline_dist_rank_relative_to_opponents**: similar to above, the rank is for the sender among all opponents instead.
 - **receiver_to_offense_gate_dist_rank_relative_to_teammates**: similar to  *sender_to_offense_gate_dist_rank_relative_to_teammates*, the rank is for the candidate receiver among his/her teammates instead.
 - **receiver_to_offense_gate_dist_rank_relative_to_opponents**: similar to *sender_to_offense_gate_dist_rank_relative_to_opponents*, the rank is for the candidate receiver among his/her opponents instead.
 - **receiver_to_top_sideline_dist_rank_relative_to_teammates**: similar to *sender_to_top_sideline_dist_rank_relative_to_teammates*, the rank is for the candidate receiver among his/her teammates instead.
 - **receiver_to_top_sideline_dist_rank_relative_to_opponents**: similar to *sender_to_top_sideline_dist_rank_relative_to_opponents*, the rank is for the candidate receiver among his/her opponents instead.
+- **sender_team_closest_dist_to_offense_goal_line**: the closest distance to sender's offense goal line among all teammates of the sender. The offense goal line is defined as the x=5250 line if sender is in the left team, and the x=-5250 line if sender is in the right team.
+- **sender_team_closest_dist_to_defense_goal_line_exclude_goalie**: the closest distance to the defense goal line among all teammates of the sender except for the goalie. The defense goal line is defined as the x=-5250 line if sender is in the left team, and the x=5250 line if sender is in the right team.
+- **sender_team_closest_dist_to_top_sideline**: the closest distance to the top sideline among all teammates of the sender.
+- **sender_team_cloeset_dist_to_bottom_sideline**: the closest distance to the bottom sideline among all teammates of the sender.
+- **sender_team_median_dist_to_offense_goal_line**: the median distance to the offense goal line among all teammates of the sender.
+- **sender_team_median_dist_to_top_sideline**: the median distance to the top sideline among all teammates of the sender.
+- **receiver_to_sender_dist_rank_among_teammates**: the rank of the distance to the sender for the candidate receiver among all receiver's teammates.
+- **receiver_to_sender_dist_rank_among_opponents**: the rank of the distance to the sender for the candidate receiver among all receiver's opponents.
