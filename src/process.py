@@ -779,7 +779,7 @@ def params_generator(params_to_sweep):
                 yield params
         
 def hyper_parameter_sweep():
-    #params_to_sweep = {'learning_rate': [0.05, 0.1, 0.2], 'num_trees': [50, 100, 200, 500], 'num_leaves': [31, 63]}
+    params_to_sweep = {'learning_rate': [0.05, 0.1, 0.2], 'num_trees': [50, 100, 200, 500], 'num_leaves': [31, 63]}
     #params_to_sweep = {'learning_rate': [0.05, 0.07], 'num_trees': [200, 500, 1000], 'min_data_in_leaf': [50], 
     #    'feature_fraction': [0.5], 'bagging_fraction': [0.5], 'num_leaves': [15, 31, 63, 127]}
     params_count = 1
@@ -914,7 +914,7 @@ def train_test_single_feature():
         writer.write('Feature %s (%d): top1_val_acc: %f, top1_train_acc: %f\n' % (feature_name, r, top1_val_results[r], results[r][0][0]))
     writer.close()
     
-def write_data_to_file_svm(data, whitelist_ids, feature_filename, query_filename, id_filename):
+def write_data_to_file_svm(data, feature_filename, query_filename, id_filename, whitelist_ids=None, check_whitelist=False):
     feature_start_column = Pass.get_feature_start_column()
     with open(feature_filename, 'w') as feature_writer, open(query_filename, 'w') as query_writer, open(id_filename, 'w') as id_writer:
         for i in range(len(data)):
@@ -922,13 +922,28 @@ def write_data_to_file_svm(data, whitelist_ids, feature_filename, query_filename
                 output_features = []
                 output_features.append(features[2]) # label
                 for j in range(feature_start_column, len(features)):
-                    if features[j] != 0 and j in whitelist_ids:
+                    if features[j] != 0 and ((not check_whitelist) or j in whitelist_ids):
                         output_features.append('%d:%s' % (j - feature_start_column + 1, features[j]))
                 feature_writer.write('%s\n' % (" ".join(output_features)))
                 id_writer.write('%s\t%s\t%s\n' % (features[0], features[1], features[4])) # pass_id, line_num, receiver_id
             query_writer.write('%d\n' % len(data[i]))
     
-def cross_validation(n_folds=10, use_model_ensemble=False):
+def get_first_fold_train_val():
+    headers, data = get_header_and_features(npy_file='all_features.npy')
+    dir = r'./lightgbm/'
+    all_pass_count = len(data)
+    test_set_size = all_pass_count // 10
+    test_set_index = range(0 * test_set_size, 1 * test_set_size)
+    val_set_index = range(1 * test_set_size, 2 * test_set_size)
+    train_set_index = range(2 * test_set_size, all_pass_count)
+    
+    train_data = data[train_set_index]
+    val_data = data[val_set_index]
+    
+    write_data_to_file_svm(train_data, dir + 'rank.train', dir + 'rank.train.query', dir + 'rank.train.id')
+    write_data_to_file_svm(val_data, dir + 'rank.val', dir + 'rank.val.query', dir + 'rank.val.id')
+    
+def cross_validation(n_folds=10, use_model_ensemble=False, check_whitelist=True):
     print("Loading data")
     headers, data = get_header_and_features(npy_file='all_features.npy')
     dir = r'./lightgbm/'
@@ -938,12 +953,12 @@ def cross_validation(n_folds=10, use_model_ensemble=False):
     new_data = []
     for passes in data:
         receiver_features = [features for features in passes if features[feature_to_index['label']] == '1']
-        if len(receiver_features) != 1 or receiver_features[0][feature_to_index['is_in_same_team']] == '0':
-            continue
+        #if len(receiver_features) != 1 or receiver_features[0][feature_to_index['is_in_same_team']] == '0':
+        #    continue
         #if passes[0][feature_to_index['is_sender_in_back_field']] == '1':
         #if passes[0][feature_to_index['is_sender_in_middle_field']] == '1':
-        if passes[0][feature_to_index['is_sender_in_front_field']] == '1':
-        #if True:
+        #if passes[0][feature_to_index['is_sender_in_front_field']] == '1':
+        if True:
             new_data.append(passes)
     data = np.array(new_data)
     print("Filter data size: %d" % len(data))
@@ -975,9 +990,9 @@ def cross_validation(n_folds=10, use_model_ensemble=False):
         print("Test data size: %d [%d-%d]" % (len(test_data), test_set_index[0], test_set_index[-1]))
         
         print("Preparing train/test files")
-        write_data_to_file_svm(train_data, whitelist_ids, dir + 'rank.train', dir + 'rank.train.query', dir + 'rank.train.id')
-        write_data_to_file_svm(val_data, whitelist_ids, dir + 'rank.val', dir + 'rank.val.query', dir + 'rank.val.id')
-        write_data_to_file_svm(test_data, whitelist_ids, dir + 'rank.test', dir + 'rank.test.query', dir + 'rank.test.id')
+        write_data_to_file_svm(train_data, dir + 'rank.train', dir + 'rank.train.query', dir + 'rank.train.id', whitelist_ids, check_whitelist=check_whitelist)
+        write_data_to_file_svm(val_data, dir + 'rank.val', dir + 'rank.val.query', dir + 'rank.val.id', whitelist_ids, check_whitelist=check_whitelist)
+        write_data_to_file_svm(test_data, dir + 'rank.test', dir + 'rank.test.query', dir + 'rank.test.id', whitelist_ids, check_whitelist=check_whitelist)
         
         if use_model_ensemble:
             train_accuracies, train_mean_reciprocal_rank, test_accuracies, test_mean_reciprocal_rank = model_ensemble()
@@ -1032,11 +1047,12 @@ if __name__ == '__main__':
     #lightgbm_train_test_with_param({'num_leaves': 31, 'learning_rate': 0.05, 'min_data_in_leaf': 50, 'num_trees': 500, 'bagging_fraction': 0.5, 'feature_fraction': 0.5})
     #lightgbm_train_test_with_param({'learning_rate': 0.05, 'min_data_in_leaf': 500, 'num_trees': 500, 'bagging_fraction': 0.5, 'feature_fraction': 1})
     #lightgbm_train_test_with_param({'learning_rate': 0.07, 'min_data_in_leaf': 50, 'num_trees': 200})
+    #get_first_fold_train_val()
     #hyper_parameter_sweep()
     #lightgbm_python()
     #model_ensemble()
     #train_test_single_feature()
-    cross_validation(n_folds=10, use_model_ensemble=True)
-    #cross_validation(n_folds=10, use_model_ensemble=False)
+    #cross_validation(n_folds=10, use_model_ensemble=True)
+    #cross_validation(n_folds=10, use_model_ensemble=True, check_whitelist=False)
     
     print('Finished in %s' % str(datetime.datetime.now() - start_time))
