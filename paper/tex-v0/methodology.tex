@@ -19,7 +19,7 @@ In this work, we calculate the pairwise Spearman correlation between our extract
 If the correlation between a pair of features is greater than a threshold, we only keep one of the two features in our model.
 In this work, we choose the correlation value of 0.8 as the threshold to remove collinear metrics, as suggested by prior work~\cite{kuhn2013applied}.
 
-\subsection{Modeling approaches}
+\subsection{Modeling approach}
 
 We formulate the task of predicting the receiver of a football pass as a learning to rank problem~\cite{liu2009learning}. 
 For each pass, our learning to rank model outputs a ranked list of the candidate receivers. 
@@ -53,12 +53,15 @@ We then average the results for each candidate and use the averaged results to r
 
 \subsection{Evaluation approaches}
 
-We use \textbf{\textit{top-N} accuracy} and \textbf{mean reciprocal rank (MRR)} to measure the performance of our models.
-\textit{Top-N} accuracy measures the probability that the actual receiver of a pass appears in the top \textit{N} predicted receivers (i.e., the \textit{N} players with the highest predicted probability of being the receiver).
-\textit{Top-1} accuracy measures the probability that the actual receiver of a pass is the player with the highest predicted probability.
-Reciprocal rank is the inverse of rank of the correct receiver in an ordered list of candidate receiver (sorted by the predicted probability of being the receiver)~\cite{Craswell2009}.
-The mean RR is the average of the reciprocal ranks over a sample of passes. The mean RR ranges from 0 to 1, the higher the better.
-%While the \textit{top-N} accuracy measures how likely the actual receiver appears in the top \textit{N} predicted receivers, the mean RR measures the average rank of the actual receivers in the predicted results.
+We use \textbf{top-N accuracy} and \textbf{mean reciprocal rank (MRR)} to measure the performance of our model.
+Top-N accuracy measures the accuracy of the model's top-N recommendations, i.e., the probability that the correct receiver of a pass appears in the top-N receiver candidates that are predicted by the model.
+For example, top-1 accuracy measures the probability that the correct receiver of a pass is the first player in the predicted list of receiver candidates.
+
+Reciprocal rank is the inverse of rank of the correct receiver of a pass in an ranked list of candidate receivers that is predicted by the model.
+MRR~\cite{Craswell2009} is the average of the reciprocal ranks over the passes in the testing data. MRR ranges from 0 to 1, the larger the better. 
+%A larger MRR means the correct receiver is closer to the front of the predicted ranked list.
+While top-N accuracy captures how likely the correct receiver appears in the top-N predicted receivers, 
+MRR captures the average rank of the correct receiver in the predicted list of receiver candidates.
  
 %We use \textbf{10-fold cross-validation} to estimate the efficacy of our models. All the passes in the dataset are randomly partitioned into 10 sets of roughly equal size. One subset is used as testing set (i.e., the held-out set) and the other nine subsets are used as training set. 
 %We train our models using the training set and evaluate the performance of our models on the held-out set.
