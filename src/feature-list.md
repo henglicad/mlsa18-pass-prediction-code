@@ -43,9 +43,16 @@
 ## Passing Path Features
 
 - **min_opponent_dist_to_sender_receiver_line**: the minimum distance an opponent has to the passing line drawn between the sender and the candidate receiver. If the sender and the candidate receiver is not in the same team, this is set to -1. The assumption is that if there is an opponent too close to the passing line, then this receiver might not be a good candidate.
-- **second_opponent_dist_to_sender_receiver_line**: similar as above, change from minimum to second minimum.
-- **third_opponent_dist_to_sender_receiver_line**: similar as above, change from minimum to third minimum.
+- **second_opponent_dist_to_sender_receiver_line**: similar to above, change from minimum to second minimum.
+- **third_opponent_dist_to_sender_receiver_line**: similar to above, change from minimum to third minimum.
 
 ## Team Position Features
 
-- 
+- **sender_to_offense_gate_dist_rank_relative_to_teammates**:  the rank of the distance to the offense gate for the sender among all teammates. This depicts the relative position of the sender in the team to the offense gate.
+- **sender_to_offense_gate_dist_rank_relative_to_opponents**: similar to above, the rank is for the sender among all opponents instead.
+- **sender_to_top_sideline_dist_rank_relative_to_teammates**: the rank of the distance to the top sideline for the sender among all teammates. This depicts the relative position of the sender in the team to the top sideline.
+- **sender_to_top_sideline_dist_rank_relative_to_opponents**: similar to above, the rank is for the sender among all opponents instead.
+- **receiver_to_offense_gate_dist_rank_relative_to_teammates**: similar to  *sender_to_offense_gate_dist_rank_relative_to_teammates*, the rank is for the candidate receiver among his/her teammates instead.
+- **receiver_to_offense_gate_dist_rank_relative_to_opponents**: similar to *sender_to_offense_gate_dist_rank_relative_to_opponents*, the rank is for the candidate receiver among his/her opponents instead.
+- **receiver_to_top_sideline_dist_rank_relative_to_teammates**: similar to *sender_to_top_sideline_dist_rank_relative_to_teammates*, the rank is for the candidate receiver among his/her teammates instead.
+- **receiver_to_top_sideline_dist_rank_relative_to_opponents**: similar to *sender_to_top_sideline_dist_rank_relative_to_opponents*, the rank is for the candidate receiver among his/her opponents instead.
