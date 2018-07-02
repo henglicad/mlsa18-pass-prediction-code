@@ -4,7 +4,7 @@ This section discuss our overall methodology, including our feature extraction p
 \subsection{Feature extraction}
 
 From the dataset that contains information about 12,124 passes\footnotemark[\ref{origin_dataset}], we extract five dimensions of features to explain the likelihood of passing the ball to a certain receiver. In total, we extract 54 features. A full list of our features is available at our public git repository\footnote{\label{feature-list}https://github.com/henglicad/mlsa18-pass-prediction/blob/master/feature-list.md}. 
-We also share our extracted feature values online~\footnote{\label{feature-values}}.
+We also share our extracted feature values online~\footnote{\label{feature-values}https://github.com/henglicad/mlsa18-pass-prediction/blob/master/features.tsv}.
 %Section~\ref{RQ3-results} discusses the most important features for explaining the receiver of a pass.
 \begin{itemize}
 	\item \textbf{Sender position features.} This dimension of features capture the position of the sender on the field, such as the sender's distance to the other team's goal. We choose this dimension of features because players have different passing strategies at different positions, for example, players may pass the ball more conservatively in their own half but more aggressively in the other team's half.
@@ -42,11 +42,11 @@ We build our model using nine subsets (i.e., the model building data) and evalua
 The process repeats 10 times until all subsets are used as testing data once.
 
 In each fold, we further split the model building data into the training data and validation data.
-We train the model on the training data and use the validation data to tune the hyper-parameters of the model \todo{list all the hyperparameters}.
+We train the model on the training data and use the validation data to tune the hyper-parameters of the model.% \todo{list all the hyperparameters}.
 We do a grid search to get the top three sets of hyper-parameter values according to the performance of the model on the validation data.
 Then, we build three models with these three set of hyper-parameters using the training data. 
 We apply these three models on the testing data and get three sets of results.
-We then average the results for each candidate and use the averaged results to rank the receiver candidates. We find that with such a model ensembling approach, the accuracy of our model improves up to 2.0\% \todo{shall we use relative improvement?}.
+We then average the results for each candidate and use the averaged results to rank the receiver candidates. We find that with such a ensemble modeling approach, the accuracy of our model improves up to 2\%.% \todo{shall we use relative improvement?}.
 
 
 

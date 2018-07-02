@@ -9,7 +9,8 @@ setwd("/Users/hengli/Projects/mlsa18-pass-prediction/src")
 #######################################################################
 ##            Loading data and preprocessing data                    ##
 #######################################################################
-rawData <- read.csv("passingfeatures.tsv", sep = "\t")
+#rawData <- read.csv("passingfeatures.tsv", sep = "\t")
+rawData <- read.csv("features.tsv", sep = "\t")
 #names(rawData)
 #data <- rawData[1:round(nrow(rawData)/10), ] # using a smaller data set for testing and debugging
 data <- rawData
