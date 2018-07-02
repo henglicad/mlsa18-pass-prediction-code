@@ -74,3 +74,10 @@ MRR captures the average rank of the correct receiver in the predicted list of r
 %The process repeats 10 times until all subsets are used as testing set once.
 
 \subsection{Feature importance}
+
+In order to understand the importance of the features in our model, we use the feature importance scores that are automatically provided by a trained LightGBM model.
+GBDT (e.g., LightGBM) provides a straightforward way to retrieve the importance scores of each feature~\cite{friedman2001elements}.
+
+After the boosting decision trees are constructed, for each decision tree, the importance of a feature is calculated by the amount that the feature improves the performance measure (e.g., Gini index) at its split point.
+The importance of each feature is then averaged across all of the decisions trees in the model. 
+
