@@ -57,8 +57,14 @@ We use \textbf{top-N accuracy} and \textbf{mean reciprocal rank (MRR)} to measur
 Top-N accuracy measures the accuracy of the model's top-N recommendations, i.e., the probability that the correct receiver of a pass appears in the top-N receiver candidates that are predicted by the model.
 For example, top-1 accuracy measures the probability that the correct receiver of a pass is the first player in the predicted list of receiver candidates.
 
-Reciprocal rank is the inverse of rank of the correct receiver of a pass in an ranked list of candidate receivers that is predicted by the model.
-MRR~\cite{Craswell2009} is the average of the reciprocal ranks over the passes in the testing data. MRR ranges from 0 to 1, the larger the better. 
+Reciprocal rank is the inverse of rank of the correct receiver of a pass in an list of candidate receivers ordered by the predicted probability of correctness.
+MRR~\cite{Craswell2009} is the average of the reciprocal ranks over a sample of passes $P$:
+\begin{equation}
+  \textrm{MRR} = \frac{1}{|P|}\displaystyle\sum_{p=1}^{|P|}\frac{1}{\textrm{rank}_p}
+\end{equation}
+where $\textrm{rank}_p$ is the rank of the correct receiver for the $p$th pass.
+The reciprocal value of MRR corresponds to the harmonic mean of the ranks.
+MRR ranges from 0 to 1, the larger the better. 
 %A larger MRR means the correct receiver is closer to the front of the predicted ranked list.
 While top-N accuracy captures how likely the correct receiver appears in the top-N predicted receivers, 
 MRR captures the average rank of the correct receiver in the predicted list of receiver candidates.
