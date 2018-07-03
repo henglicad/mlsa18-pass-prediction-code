@@ -1,9 +1,9 @@
 \section{Methodology} \label{methodology}
-This section discuss our overall methodology, including our feature extraction process, modeling and evaluation approaches.
+This section discusses our overall methodology, including our feature extraction process, modeling and evaluation approaches.
 
 \subsection{Feature extraction}
 
-From the dataset that contains information about 12,124 passes\footnotemark[\ref{origin_dataset}], we extract five dimensions of features to explain the likelihood of passing the ball to a certain receiver. In total, we extract 54 features. A full list of our features is available at our public git repository\footnote{\label{feature-list}https://github.com/henglicad/mlsa18-pass-prediction/blob/master/feature-list.md}. 
+From the dataset that contains information about 12,124 passes\footnotemark[\ref{origin_dataset}], we extract five dimensions of features to explain the likelihood of passing the ball to a certain receiver. In total, we extract 54 features. A full list of our features is available at our public github repository\footnote{\label{feature-list}https://github.com/henglicad/mlsa18-pass-prediction/blob/master/feature-list.md}. 
 We also share our extracted feature values online~\footnote{\label{feature-values}https://github.com/henglicad/mlsa18-pass-prediction/blob/master/features.tsv}.
 %Section~\ref{RQ3-results} discusses the most important features for explaining the receiver of a pass.
 \begin{itemize}
@@ -11,7 +11,7 @@ We also share our extracted feature values online~\footnote{\label{feature-value
 	\item \textbf{Candidate receiver position features.} This dimension of features capture the position of a candidate receiver, such as the candidate receiver's distance to the sender. Senders always consider candidate receivers' positions when they decide to whom to pass the ball.
 	\item \textbf{Passing path features.} This dimension of features measure the quality of a passing path (i.e., the path from the sender to a candidate receiver), such as the passing angle. The quality of a passing path can predict the outcome (success/failure) of a pass.
 	\item \textbf{Team position features.} This dimension of features capture the overall position of the team in control of the ball, such as the front line of the team. Team position might also impact the passing strategy, for example, a defensive team position might be more likely to pass the ball forwards.
-	\item \textbf{Game state features.} This dimension of feature capture the state of the whole game, such as the time when the sender passes the ball. \textbf{We do not use the time when the receiver receives the ball as a feature in our model, as it exposes information about the actual pass (e.g., pass duration).}
+	\item \textbf{Game state features.} This dimension of features capture the state of the whole game, such as the time when the sender passes the ball. \textbf{We do not use the time when the receiver receives the ball as a feature in our model, as it exposes information about the actual pass (e.g., pass duration).}
 \end{itemize}
 
 %\subsection{Removing redundant features}
@@ -25,11 +25,11 @@ We also share our extracted feature values online~\footnote{\label{feature-value
 
 We formulate the task of predicting the receiver of a football pass as a learning to rank problem~\cite{liu2009learning}. 
 For each pass, our learning to rank model outputs a ranked list of the candidate receivers. 
-A good model should rank the correct receiver in the front of the ranked list.
-Gradient boosting decision tree (GBDT) is widely used for learning to rank tasks.
-There are quite a few effective implementations of GBDT, such as XGBoost and pGBRT, which usually achieves state-of-the-art performance in learning to rank tasks.
+A good model should rank the correct receiver among the top of the ranked list.
+\textbf{LambdaMART}~\cite{burges2010ranknet} which is the gradient boosted tree version of LambdaRank is widely used for learning to rank tasks.
+There are quite a few effective implementations of LambdaMART, such as XGBoost and pGBRT, which usually achieves state-of-the-art performance in learning to rank tasks.
 
-In this work, we use an efficient implementation of GBDT, \textbf{LightGBM}~\cite{NIPS2017_6907}, which speeds up the training time of conventional GBDT (e.g., XGBoost and pGBRT) by up to 20 times while achieving almost the same accuracy. 
+In this work, we use an efficient implementation of LambdaMART, \textbf{LightGBM}~\cite{NIPS2017_6907}, which speeds up the training time of conventional LambdaMART (e.g., XGBoost and pGBRT) by up to 20 times while achieving almost the same accuracy. 
 We use an open source implementation of LightGBM that is contributed by Microsoft\footnote{https://github.com/Microsoft/LightGBM}.
 
 %\todo{Please help refine the language}
@@ -45,7 +45,7 @@ We train the model on the training data and use the validation data to tune the 
 We do a grid search to get the top three sets of hyper-parameter values according to the performance of the model on the validation data.
 Then, we build three models with these three set of hyper-parameters using the training data. 
 We apply these three models on the testing data and get three sets of results.
-We then average the results for each receiver candidate and use the averaged results to rank the receiver candidates. We find that with such a ensemble modeling approach, the accuracy of our model improves up to 2\%.% \todo{shall we use relative improvement?}.
+We then average the results for each receiver candidate and use the averaged results to rank the receiver candidates. We find that with such an ensemble modeling approach, the accuracy of our model improves up to 2\%.% \todo{shall we use relative improvement?}.
 
 
 
@@ -80,8 +80,7 @@ Therefore, we use a mean top-N accuracy and MRR across the 10 folds in Section~\
 \subsection{Feature importance}
 
 In order to understand the importance of the features in our model, we use the feature importance scores that are automatically provided by a trained LightGBM model.
-GBDT (e.g., LightGBM) provides a straightforward way to retrieve the importance scores of each feature~\cite{friedman2001elements}.
+Gradient boosted trees (e.g., LightGBM) provide a straightforward way to retrieve the importance scores of each feature~\cite{friedman2001elements}.
 
-After the boosting decision trees are constructed, for each decision tree, the importance of a feature is calculated by the amount that the feature improves the performance measure (i.e., Gini index) at its split point.
-The importance of each feature is then averaged across all of the decisions trees in the model. 
+After the boosted decision trees are constructed, the importance of a feature is calculated by accumulating all the split gains (i.e., Gini index) that the feature has contributed to the model.
 
