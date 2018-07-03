@@ -4,7 +4,7 @@
 Table~\ref{tab:performance-accurate-passes} shows the performance of our model when we exclude false passes. 
 The ``Back-field'', ``Middle-field'', ``Front-field'' and ``Overall'' columns show the performance of our model for back-field passes, middle-field passes, front-field passes and all passes, respectively. 
 A top-3 accuracy of 84\% for all passes means that the actual receiver of a pass has a 84\% chance to appear in our top-3 predicted candidates.
-The MRR value for all passes is 0.68, which means on average, the correct receiver is ranked $1.5$th (i.e., 1/0.68) out of 10 receiver candidates (i.e., all teammates of the sender).
+The MRR value for all passes is 0.68, which means on average, the correct receiver is ranked $1.5$th (i.e., 1/0.68) out of 10 or less receiver candidates (i.e., all teammates of the sender).
 
 
 \begin{table}[!t]
@@ -28,7 +28,7 @@ The MRR value for all passes is 0.68, which means on average, the correct receiv
 Table~\ref{tab:performance-all-passes} shows the performance of our model when we consider all passes (including false passes). 
 The performance of our model decreases when we consider false passes (i.e., passes to the other team). 
 False passes are very difficult to predict because it is not the sender player's intention to pass the ball to the other team. 
-The MRR value for all passes is 0.58, which means the correct receiver is averagely ranked $1.7$th (i.e., 1/0.58) out of all 21 candidate receivers (i.e., all players excluding the sender).
+The MRR value for all passes is 0.58, which means the correct receiver is averagely ranked $1.7$th (i.e., 1/0.58) out of all 21 or less candidate receivers (i.e., all players excluding the sender).
 
 \begin{table}[!t]
 \caption{The accuracy of our model for predicting the receiver of a pass (considering all passes including passes to the other team).}
