@@ -21,7 +21,7 @@ The MRR value for all passes is 0.68, which means on average, the correct receiv
   \hline
 \end{tabular}
 \label{tab:performance-accurate-passes}
-\vspace{-0.3cm}
+\vspace{-0.4cm}
 \end{table}
 
 \textbf{Our model can predict the receiver of a pass with a top-1, top-3 and top-5 accuracy of 41\%, 70\%, and 81\%, respectively, when we consider all passes.}
@@ -44,7 +44,7 @@ The MRR value for all passes is 0.58, which means the correct receiver is averag
   \hline
 \end{tabular}
 \label{tab:performance-all-passes}
-\vspace{-0.3cm}
+\vspace{-0.4cm}
 \end{table}
 
 \textbf{Our model performs better for back-field and front-field passes, while performing worse for middle-field passes.}
@@ -56,6 +56,7 @@ Our online feature list\footnotemark[\ref{feature-list}] also shows each feature
 Among the top 10 important features, there are eight features from the candidate receiver position dimension, one from the sender position dimension, and one from the passing path dimension.
 Among the top 20 important features, there are 12 features from the candidate receiver position dimension, four from the sender position dimension, three from the passing path dimension, and one from the team position dimension.
 
+\vspace{-0.3cm}
 \hypobox{
 Our model can predict the receiver of a pass with a top-1, top-3 and top-5 accuracy of 50\%, 84\%, and 94\%, respectively, when we exclude false passes. Our model performs better when the sender of a pass is in the back or front area of the field.
 }
