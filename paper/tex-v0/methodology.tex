@@ -28,7 +28,7 @@ For each pass, our learning to rank model outputs a ranked list of the candidate
 A good model should rank the correct receiver at the front of the ranked list. 
 LambdaRank~\cite{burges2010ranknet} is a general and widely-used learning to rank framework. %which is widely used for learning to rank tasks. 
 LambdaRank relies on underlying regression models to provide ranking predictions.
-\textbf{LambdaMART}~\cite{burges2010ranknet} is the boosted tree version of LambdaRank. It relies on a Gradient Boosting Decision Tree (GBDT)~\cite{friedman2001greedy} to provide ranking predictions.
+\textbf{LambdaMART}~\cite{burges2010ranknet} is the boosting tree version of LambdaRank. It relies on a gradient boosting decision tree (GBDT)~\cite{friedman2001greedy} to provide ranking predictions.
 % combines LambdaRank and Gradient Boosting Decision Trees (GBDT) to provide high performance ranking predictions.
 % gradient boosted decision trees (GBDT) is a common choice to achieve high performance. The combination of LambdaRank and GBDT is usually termed \textbf{LambdaMART}~\cite{burges2010ranknet}.
 There are quite a few effective implementations of LambdaMART, such as XGBoost and pGBRT, which usually achieve state-of-the-art performance in learning to rank tasks.
@@ -84,7 +84,8 @@ Therefore, we use a mean top-N accuracy and MRR across the 10 folds in Section~\
 \subsection{Feature importance}
 
 In order to understand the importance of the features in our model, we use the feature importance scores that are automatically provided by a trained LightGBM model.
-Gradient boosted trees (e.g., LightGBM) provide a straightforward way to retrieve the importance scores of each feature~\cite{friedman2001elements}.
+Gradient boosting decision trees (e.g., LightGBM) provide a straightforward way to retrieve the importance scores of each feature~\cite{friedman2001elements}.
 
-After the boosted decision trees are constructed, the importance of a feature is calculated by accumulating all the split gains (i.e., Gini index) that the feature has contributed to the model.
+%After the boosting decision trees are constructed, the importance of a feature is calculated by accumulating all the split gains (i.e., Gini index) that the feature has contributed to the model.
+After the boosting decision trees are constructed, for each decision tree, the importance of a feature is calculated by the amount that the feature improves the performance measure at its split point (i.e., split gains). The importance of each feature is then accumulated across all of the decisions trees in the model.
 

@@ -31,6 +31,7 @@ False passes are very difficult to predict because it is not the sender player's
 The MRR value for all passes is 0.58, which means the correct receiver is averagely ranked $1.7$th (i.e., 1/0.58) out of all 21 or less candidate receivers (i.e., all players excluding the sender).
 
 \begin{table}[!t]
+\vspace{-0.2cm}
 \caption{The accuracy of our model for predicting the receiver of a pass (considering all passes including passes to the other team).}
 \centering
 \begin{tabular}{lcccc}
@@ -56,7 +57,7 @@ Our online feature list\footnotemark[\ref{feature-list}] also shows each feature
 Among the top 10 important features, there are eight features from the candidate receiver position dimension, one from the sender position dimension, and one from the passing path dimension.
 Among the top 20 important features, there are 12 features from the candidate receiver position dimension, four from the sender position dimension, three from the passing path dimension, and one from the team position dimension.
 
-\vspace{-0.3cm}
+\vspace{-0.4cm}
 \hypobox{
 Our model can predict the receiver of a pass with a top-1, top-3 and top-5 accuracy of 50\%, 84\%, and 94\%, respectively, when we exclude false passes. Our model performs better when the sender of a pass is in the back or front area of the field.
 }
