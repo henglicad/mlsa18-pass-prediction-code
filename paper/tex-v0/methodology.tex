@@ -25,8 +25,7 @@ We also share our extracted feature values online~\footnote{\label{feature-value
 
 We formulate the task of predicting the receiver of a football pass as a learning to rank problem~\cite{liu2009learning}. 
 For each pass, our learning to rank model outputs a ranked list of the candidate receivers. 
-A good model should rank the correct receiver among the top of the ranked list.
-\textbf{LambdaMART}~\cite{burges2010ranknet} which is the gradient boosted tree version of LambdaRank is widely used for learning to rank tasks.
+A good model should rank the correct receiver among the top of the ranked list. \textbf{LambdaRank}~\cite{burges2010ranknet} is a general learning to rank framework which is widely used for learning to rank tasks. It can work with lots of underlying regression models. Among those, gradient boosted decision trees (GBDT) is a common choice to achieve high performance. The combination of LambdaRank and GBDT is usually termed \textbf{LambdaMART}~\cite{burges2010ranknet}.
 There are quite a few effective implementations of LambdaMART, such as XGBoost and pGBRT, which usually achieve state-of-the-art performance in learning to rank tasks.
 
 In this work, we use an efficient implementation of LambdaMART, \textbf{LightGBM}~\cite{NIPS2017_6907}, which speeds up the training time of conventional LambdaMART (e.g., XGBoost and pGBRT) by up to 20 times while achieving almost the same accuracy. 
