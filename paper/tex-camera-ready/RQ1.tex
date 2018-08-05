@@ -1,53 +1,58 @@
-\subsection{RQ1: What are the characteristics of football passes?}\label{RQ1-results}
+\subsection{RQ1: How well can we model the receiver of a pass?}\label{RQ2-results}
 
-\textbf{Overall, players' passing accuracy is 83\%, and the passing accuracy decreases from the back field to the front field.} 
-Table~\ref{tab:pass-statistics} shows a summary of players' passing statistics. 
-We define the passing accuracy as the ratio of the passes that reach a teammate.
-We divide the field into three equal-sized areas along the long side of the field, namely back field, middle field and front field.
-We define a pass as a \textbf{back-field pass}, \textbf{middle-field pass}, or \textbf{front-field} pass when the sender is within the back field, the middle field and the front field, respectively.
-The passing accuracy for the back field, middle field, and front field is 86\%, 83\%, and 79\%, respectively.
+\textbf{Our model can predict the receiver of a pass with a top-1, top-3 and top-5 accuracy of 50\%, 84\%, and 94\%, respectively, when we exclude false passes (i.e., passes to the other team).}
+Table~\ref{tab:performance-accurate-passes} shows the performance of our model when we exclude false passes. 
+The ``Back-field'', ``Middle-field'', ``Front-field'' and ``Overall'' columns show the performance of our model for back-field passes, middle-field passes, front-field passes and all passes, respectively. 
+A top-3 accuracy of 84\% for all passes means that the actual receiver of a pass has a 84\% chance to appear in our top-3 predicted candidates.
+The MRR value for all passes is 0.68, which means on average, the correct receiver is ranked $1.5$th (i.e., 1/0.68) out of 10 or less receiver candidates (i.e., all teammates of the sender).
+
 
 \begin{table}[!t]
-\vspace{-0.2cm}
-\caption{A summary of players' passing statistics.}
+\caption{The accuracy of our model for predicting the receiver of a pass (excluding false passes).}
 \centering
 \begin{tabular}{lcccc}
   \hline
   & Back-field & Middle-field & Front-field & Overall \\
   \hline
-  Passing accuracy & 86\% & 83\% & 79\% & 83\% \\
-  Median passing distance (m) & 17 & 14 & 11 & 14 \\
-  Passing forwards ratio & 74\% & 61\% & 50\% & 62\% \\
+  Top-1 accuracy & 53\% & 46\% & 55\% & 50\% \\
+  Top-3 accuracy & 84\% & 81\% & 91\% & 84\% \\
+  Top-5 accuracy & 93\% & 93\% & 97\% & 94\% \\
+  MRR & 0.70 & 0.66 & 0.73 & 0.68 \\
   \hline
 \end{tabular}
-\label{tab:pass-statistics}
-\vspace{-0.2cm}
+\label{tab:performance-accurate-passes}
+%\vspace{-0.4cm}
 \end{table}
 
-\textbf{The median passing distance is 14 meters, and the passing distance decreases from the back field to the front field.}
-Table~\ref{tab:pass-dist} shows the five-number summary of players' passing distance. While the maximum passing distance is 70 meters, 50\% of the passes are between 9 and 20 meters.
-As shown in Table~\ref{tab:pass-statistics}, the median passing distance for the back field, middle field, and front field is 17, 14, and 11 meters, respectively.
+\textbf{Our model can predict the receiver of a pass with a top-1, top-3 and top-5 accuracy of 41\%, 70\%, and 81\%, respectively, when we consider all passes.}
+Table~\ref{tab:performance-all-passes} shows the performance of our model when we consider all passes (including false passes). 
+The performance of our model decreases when we consider false passes (i.e., passes to the other team). 
+False passes are very difficult to predict because it is not the sender player's intention to pass the ball to the other team. 
+The MRR value for all passes is 0.58, which means the correct receiver is averagely ranked $1.7$th (i.e., 1/0.58) out of all 21 or less candidate receivers (i.e., all players excluding the sender).
 
 \begin{table}[!t]
-%\vspace{-0.1cm}
-\caption{Five-number summary of players' passing distance.}
+%\vspace{-0.2cm}
+\caption{The accuracy of our model for predicting the receiver of a pass (considering all passes including passes to the other team).}
 \centering
-\begin{tabular}{c c c c c}
-\hline
-Min. & 1st Qu. & Median & 3rd Qu. & Max. \\
-\hline
-0 & 9 & 14 & 20 & 70 \\
-\hline
+\begin{tabular}{lcccc}
+  \hline
+  & Back-field & Middle-field & Front-field & Overall \\
+  \hline
+  Top-1 accuracy & 45\% & 38\% & 43\% & 41\% \\
+  Top-3 accuracy & 72\% & 68\% & 72\% & 70\% \\
+  Top-5 accuracy & 82\% & 80\% & 83\% & 81\% \\
+  MRR & 0.61 & 0.56 & 0.60 & 0.58 \\
+  \hline
 \end{tabular}
-\label{tab:pass-dist}
-\vspace{-0.2cm}
+\label{tab:performance-all-passes}
+%\vspace{-0.4cm}
 \end{table}
 
-\textbf{Players pass the ball forwards in 62\% of the passes, and the ratio of forward-passing decreases from the back field to the front field.} In the back field, players pass the ball forwards in 74\% of the passes, and the ratio decreases to 61\% and 50\% for middle-field passes and front-field passes, respectively.
+\textbf{Our model performs better for back-field and front-field passes, while performing worse for middle-field passes.}
+Table~\ref{tab:performance-accurate-passes} and Table~\ref{tab:performance-all-passes} also shows the performance of our model for back-field, middle-field and front-field passes, separately.
+Surprisingly, the performance of our model is the worst for middle-field passes. A player in the middle area may have more passing options, thereby increasing the difficulty to predict the right receivers.
 
-\vspace{-0.4cm}
+%\vspace{-0.4cm}
 \hypobox{
-Players present different passing characteristics in different areas of the field. 
-%which motivates us to extract features that capture the positions of the players in the field. 
-Such differences suggest us to build and evaluate our model in different areas of the field separately.
+Our model can predict the receiver of a pass with a top-1, top-3 and top-5 accuracy of 50\%, 84\%, and 94\%, respectively, when we exclude false passes. Our model performs better when the sender of a pass is in the back or front area of the field.
 }

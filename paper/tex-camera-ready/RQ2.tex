@@ -1,63 +1,6 @@
-\subsection{RQ2: How well can we model the receiver of a pass?}\label{RQ2-results}
-
-\textbf{Our model can predict the receiver of a pass with a top-1, top-3 and top-5 accuracy of 50\%, 84\%, and 94\%, respectively, when we exclude false passes (i.e., passes to the other team).}
-Table~\ref{tab:performance-accurate-passes} shows the performance of our model when we exclude false passes. 
-The ``Back-field'', ``Middle-field'', ``Front-field'' and ``Overall'' columns show the performance of our model for back-field passes, middle-field passes, front-field passes and all passes, respectively. 
-A top-3 accuracy of 84\% for all passes means that the actual receiver of a pass has a 84\% chance to appear in our top-3 predicted candidates.
-The MRR value for all passes is 0.68, which means on average, the correct receiver is ranked $1.5$th (i.e., 1/0.68) out of 10 or less receiver candidates (i.e., all teammates of the sender).
-
-
-\begin{table}[!t]
-\caption{The accuracy of our model for predicting the receiver of a pass (excluding false passes).}
-\centering
-\begin{tabular}{lcccc}
-  \hline
-  & Back-field & Middle-field & Front-field & Overall \\
-  \hline
-  Top-1 accuracy & 53\% & 46\% & 55\% & 50\% \\
-  Top-3 accuracy & 84\% & 81\% & 91\% & 84\% \\
-  Top-5 accuracy & 93\% & 93\% & 97\% & 94\% \\
-  MRR & 0.70 & 0.66 & 0.73 & 0.68 \\
-  \hline
-\end{tabular}
-\label{tab:performance-accurate-passes}
-\vspace{-0.4cm}
-\end{table}
-
-\textbf{Our model can predict the receiver of a pass with a top-1, top-3 and top-5 accuracy of 41\%, 70\%, and 81\%, respectively, when we consider all passes.}
-Table~\ref{tab:performance-all-passes} shows the performance of our model when we consider all passes (including false passes). 
-The performance of our model decreases when we consider false passes (i.e., passes to the other team). 
-False passes are very difficult to predict because it is not the sender player's intention to pass the ball to the other team. 
-The MRR value for all passes is 0.58, which means the correct receiver is averagely ranked $1.7$th (i.e., 1/0.58) out of all 21 or less candidate receivers (i.e., all players excluding the sender).
-
-\begin{table}[!t]
-\vspace{-0.2cm}
-\caption{The accuracy of our model for predicting the receiver of a pass (considering all passes including passes to the other team).}
-\centering
-\begin{tabular}{lcccc}
-  \hline
-  & Back-field & Middle-field & Front-field & Overall \\
-  \hline
-  Top-1 accuracy & 45\% & 38\% & 43\% & 41\% \\
-  Top-3 accuracy & 72\% & 68\% & 72\% & 70\% \\
-  Top-5 accuracy & 82\% & 80\% & 83\% & 81\% \\
-  MRR & 0.61 & 0.56 & 0.60 & 0.58 \\
-  \hline
-\end{tabular}
-\label{tab:performance-all-passes}
-\vspace{-0.4cm}
-\end{table}
-
-\textbf{Our model performs better for back-field and front-field passes, while performing worse for middle-field passes.}
-Table~\ref{tab:performance-accurate-passes} and Table~\ref{tab:performance-all-passes} also shows the performance of our model for back-field, middle-field and front-field passes, separately.
-Surprisingly, the performance of our model is the worst for middle-field passes. A player in the middle area may have more passing options, thereby increasing the difficulty to predict the right receivers.
+\subsection{RQ2: what are the important factors that explain the receiver of a pass?}\label{RQ3-results}
 
 \textbf{The features that capture the candidate receivers' positions play the most important roles in explaining the target of a pass.}
 Our online feature list\footnotemark[\ref{feature-list}] also shows each feature's importance score in our model.
 Among the top 10 important features, there are eight features from the candidate receiver position dimension, one from the sender position dimension, and one from the passing path dimension.
 Among the top 20 important features, there are 12 features from the candidate receiver position dimension, four from the sender position dimension, three from the passing path dimension, and one from the team position dimension.
-
-\vspace{-0.4cm}
-\hypobox{
-Our model can predict the receiver of a pass with a top-1, top-3 and top-5 accuracy of 50\%, 84\%, and 94\%, respectively, when we exclude false passes. Our model performs better when the sender of a pass is in the back or front area of the field.
-}
