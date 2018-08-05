@@ -1,0 +1,90 @@
+% This is samplepaper.tex, a sample chapter demonstrating the
+% LLNCS macro package for Springer Computer Science proceedings;
+% Version 2.20 of 2017/10/04
+%
+\documentclass[runningheads]{llncs}
+%
+\usepackage{graphicx}
+% Used for displaying a sample figure. If possible, figure files should
+% be included in EPS format.
+%
+% If you use the hyperref package, please uncomment the following line
+% to display URLs in blue roman font according to Springer's eBook style:
+% \renewcommand\UrlFont{\color{blue}\rmfamily}
+
+\usepackage{color}
+\newcommand{\heng}[1]{\textcolor{blue}{{\it [Heng says: #1]}}}
+\newcommand{\todo}[1]{\textcolor{red}{\textbf{[[TODO: #1]]}}}
+
+\usepackage{fancybox}		
+\newcommand{\hypobox}[1]{\begin{center}%	
+	\noindent\thicklines\setlength{\fboxsep}{7pt}%	
+	%\cornersize{0}\Ovalbox{\begin{minipage}{3.1in}%
+	%\cornersize{0}\shadowbox{\begin{minipage}{3.1in}%	
+	%\cornersize{0}\Ovalbox{\begin{minipage}{4in}%
+	\cornersize{0}\Ovalbox{\begin{minipage}{0.96\textwidth}%	
+		%\vspace{-0.1cm}
+		%\textit{#1}
+		#1
+		%\vspace{-0.1cm}
+		\end{minipage}} \end{center}}
+
+%\usepackage{booktabs} % For formal tables
+%\usepackage{url}
+
+\begin{document}
+%
+\title{Predicting the Receivers of Football Passes}
+%
+%\titlerunning{Abbreviated paper title}
+% If the paper title is too long for the running head, you can set
+% an abbreviated paper title here
+%
+\author{Heng Li\inst{1} \and
+Zhiying Zhang\inst{2}
+% \and Third Author\inst{3}\orcidID{2222--3333-4444-5555}
+ }
+%
+\authorrunning{H. Li and Z. Zhang}
+% First names are abbreviated in the running head.
+% If there are more than two authors, 'et al.' is used.
+%
+\institute{School of Computing, Queen's University, Kingston, Canada\\
+\email{hengli@cs.queensu.ca}
+\and
+Microsoft, Bellevue, WA, USA\\
+\email{zhiyingz@microsoft.com}\\
+}
+%
+\maketitle              % typeset the header of the contribution
+%
+\begin{abstract}
+%The abstract should briefly summarize the contents of the paper in
+%150--250 words.
+\input{tex-camera-ready/abstract}
+
+\keywords{Football pass prediction \and Learning to rank \and LambdaMART \and Gradient boosting decision tree \and LightGBM.}
+\end{abstract}
+%
+%
+%
+
+\input{tex-camera-ready/introduction}
+
+\input{tex-camera-ready/methodology}
+
+\input{tex-camera-ready/results}
+
+\input{tex-camera-ready/conclusions}
+
+%
+% ---- Bibliography ----
+%
+% BibTeX users should specify bibliography style 'splncs04'.
+% References will then be sorted and formatted in the correct style.
+%
+\bibliographystyle{splncs04}
+\bibliography{mybibliography}
+%
+
+\end{document}

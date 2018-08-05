@@ -1,0 +1,34 @@
+\section{Introduction} \label{intro}
+%This section discuss our motivation, briefly mention our approach, and introduce the research questions that we want to answer:
+In a football game, players pass the ball to their teammates in order to create good shooting opportunities or prevent the opposing team from getting the control of the ball.
+Accurately passing ball to the right player is essential for winning a football game~\cite{Ali2011Measuring,Hughes2005Analysis}.
+
+Prior work~\cite{reep1968skill,Hughes2005Analysis} studies how passing sequences lead to goals. Their findings have shaped the tactics of many football coaches.
+In this work, we study football players' passing patterns and build a learning to rank model~\cite{liu2009learning} to anticipate the receiver of a pass.
+We believe that football coaches and players can take our results into consideration when they make their tactics or make their passes/runs. 
+%For example, anticipating passing receivers can help players be aware of the best positions to get a pass.
+Anticipating receivers of passes can also help automatic cameras always focus on the ball in a game.
+
+This work analyzes a dataset which contains 12,124 passes performed by a Belgian football club in 14 games\footnote{\label{origin_dataset}https://github.com/JanVanHaaren/mlsa18-pass-prediction}. We want to answer the following research questions (RQs): 
+
+\begin{description}
+	%\item \textbf{RQ1: What are players' passing patterns?}
+	\item \textbf{RQ1: What are the characteristics of football passes?}
+	We discuss how players pass the ball on the field, e.g., what is their passing accuracy? %, how often do they pass the ball forwards?
+	Understanding players' passing patterns can help us derive features that can explain the receiver of a pass. 
+	%Players' passing patterns can also help football coaches and players make informed tactics.
+	
+	\item \textbf{RQ2: How well can we model the receiver of a pass?}
+	We build a learning to rank model to predict the receiver of a football pass. 
+	Such a model can help coaches and players better understand passes in a game and make informed tactical decisions.
+	
+	%\item \textbf{RQ3: What are the influential factors that explain the receiver of a pass?}
+	%We analyze the model to find the most influential factors that explain the receiver of a pass. Understanding such influential factors can help coaches and players improve their tactics according to these factors.
+\end{description}
+
+\textbf{Paper organization.}
+The remainder of the paper is organized as follows.
+Section~\ref{methodology} discusses our approaches for building and evaluating our prediction model. %, including feature extraction, our modeling approach and evaluation measures.
+Section~\ref{results} presents the results for answering our research questions.
+Finally, Section~\ref{conclusions} draws conclusions.
+

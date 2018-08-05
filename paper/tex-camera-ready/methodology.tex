@@ -1,0 +1,91 @@
+\section{Methodology} \label{methodology}
+This section discusses our overall methodology, including our feature extraction process, modeling and evaluation approaches.
+
+\subsection{Feature extraction}
+
+From the dataset that contains information about 12,124 passes\footnotemark[\ref{origin_dataset}], we extract five dimensions of features to explain the likelihood of passing the ball to a certain receiver. In total, we extract 54 features. A full list of our features is available at our public github repository\footnote{\label{feature-list}https://github.com/henglicad/mlsa18-pass-prediction/blob/master/feature-list.md}. 
+We also share our extracted feature values online~\footnote{\label{feature-values}https://github.com/henglicad/mlsa18-pass-prediction/blob/master/features.tsv}.
+%Section~\ref{RQ3-results} discusses the most important features for explaining the receiver of a pass.
+\begin{itemize}
+	\item \textbf{Sender position features.} This dimension of features capture the position of the sender on the field, such as the sender's distance to the other team's goal. We choose this dimension of features because players have different passing strategies at different positions, for example, players may pass the ball more conservatively in their own half. %but more aggressively in the other team's half.
+	\item \textbf{Candidate receiver position features.} This dimension of features capture the position of a candidate receiver, such as the candidate receiver's distance to the sender. Senders always consider candidate receivers' positions when they decide to whom to pass the ball.
+	\item \textbf{Passing path features.} This dimension of features measure the quality of a passing path (i.e., the path from the sender to a candidate receiver), such as the passing angle. The quality of a passing path can predict the outcome (success/failure) of a pass.
+	\item \textbf{Team position features.} This dimension of features capture the overall position of the team in control of the ball, such as the front line of the team. Team position might also impact the passing strategy, for example, a defensive team position might be more likely to pass the ball forwards.
+	\item \textbf{Game state features.} This dimension of features capture the state of the whole game, such as the time when the sender passes the ball. \textbf{We do not use the time when the receiver receives the ball as a feature in our model, as it exposes information about the actual pass (e.g., pass duration).}
+\end{itemize}
+
+%\subsection{Removing redundant features}
+
+%Redundant features usually add more complexity to the model than the information they provide to the model. Redundant features can also result in highly unstable models~\cite{kuhn2013applied}.
+%In this work, we calculate the pairwise Spearman correlation between our extracted features and remove collinearity among these features.
+%If the correlation between a pair of features is greater than a threshold, we only keep one of the two features in our model.
+%In this work, we choose the correlation value of 0.8 as the threshold to remove collinear metrics, as suggested by prior work~\cite{kuhn2013applied}.
+
+\subsection{Modeling approach}\label{model-approach}
+
+We formulate the task of predicting the receiver of a football pass as a learning to rank problem~\cite{liu2009learning}. 
+For each pass, our learning to rank model outputs a ranked list of the candidate receivers. 
+A good model should rank the correct receiver at the front of the ranked list. 
+LambdaRank~\cite{burges2010ranknet} is a general and widely-used learning to rank framework. %which is widely used for learning to rank tasks. 
+LambdaRank relies on underlying regression models to provide ranking predictions.
+\textbf{LambdaMART}~\cite{burges2010ranknet} is the boosting tree version of LambdaRank. It relies on a gradient boosting decision tree (GBDT)~\cite{friedman2001greedy} to provide ranking predictions.
+% combines LambdaRank and Gradient Boosting Decision Trees (GBDT) to provide high performance ranking predictions.
+% gradient boosted decision trees (GBDT) is a common choice to achieve high performance. The combination of LambdaRank and GBDT is usually termed \textbf{LambdaMART}~\cite{burges2010ranknet}.
+There are quite a few effective implementations of LambdaMART, such as XGBoost and pGBRT, which usually achieve state-of-the-art performance in learning to rank tasks.
+
+In this work, we use an efficient implementation of LambdaMART, \textbf{LightGBM}~\cite{NIPS2017_6907}, which speeds up the training time of conventional LambdaMART implementations (e.g., XGBoost and pGBRT) by up to 20 times while achieving almost the same accuracy. 
+We use an open source implementation of LightGBM that is contributed by Microsoft\footnote{https://github.com/Microsoft/LightGBM}.
+
+%\todo{Please help refine the language}
+We use a 10-fold cross-validation to build and evaluate our model. 
+The passes data is randomly partitioned into 10 subsets of roughly equal size. 
+%One subset is used as testing set (i.e., the held-out set) and the other nine subsets are used as training set. 
+We build our model using nine subsets (i.e., the model building data) and evaluate the performance of our model on the held-out subset (i.e., the testing data).
+%We train our models using the training set and evaluate the performance of our model on the held-out set.
+The process repeats 10 times until all subsets are used as testing data once.
+
+In each fold, we further split the model building data into the training data and validation data.
+We train the model on the training data and use the validation data to tune the hyper-parameters of the model. % \todo{list all the hyperparameters}.
+We do a grid search to get the top three sets of hyper-parameter values according to the performance of the model on the validation data.
+Then, we build three models with these three set of hyper-parameters using the training data. 
+We apply these three models on the testing data and get three sets of results.
+We then average the results for each receiver candidate and use the averaged results to rank the receiver candidates. We find that with such an ensemble modeling approach, the accuracy of our model improves up to 2\%.% \todo{shall we use relative improvement?}.
+
+
+
+%For each fold, we hold out 10\% of the data as test set. 
+%For the first fold, we continue to split the data into training and validation data, then we do a grid search to get the top three set of parameters according to the validation set performance. Then for each fold, we train three models with these three set of hyperparameters \todo{list all the hyperparameters} on the training data. On test data, we use the three models to predict to get three sets of result, and then average the prediction results for each candidate, then use the averaged result to do ranking. We find that with model ensembling, all the accuracy numbers improve about 0.1\%\~2.0\%.
+
+\subsection{Evaluation approaches}\label{evaluation-approach}
+
+We use \textbf{top-N accuracy} and \textbf{mean reciprocal rank (MRR)} to measure the performance of our model.
+Top-N accuracy measures the accuracy of the model's top-N recommendations, i.e., the probability that the correct receiver of a pass appears in the top-N receiver candidates that are predicted by the model.
+For example, top-1 accuracy measures the probability that the correct receiver of a pass is the first player in the predicted list of receiver candidates.
+
+Reciprocal rank is the inverse of the rank of the correct receiver of a pass in an ranked list of candidate receivers predicted by the model.
+MRR~\cite{Craswell2009} is the average of the reciprocal ranks over a sample of passes $P$:
+\begin{equation}
+  \textrm{MRR} = \frac{1}{|P|}\displaystyle\sum_{p=1}^{|P|}\frac{1}{\textrm{rank}_p}
+\end{equation}
+where $\textrm{rank}_p$ is the rank of the correct receiver for the $p$th pass.
+The reciprocal value of MRR corresponds to the harmonic mean of the ranks.
+MRR ranges from 0 to 1, the larger the better. 
+%A larger MRR means the correct receiver is closer to the front of the predicted ranked list.
+While top-N accuracy captures how likely the correct receiver appears in the top-N predicted receivers, 
+MRR captures the average rank of the correct receiver in the predicted list of receiver candidates.
+
+As discussed in Section~\ref{model-approach}, we use a 10-fold cross-validation to build and evaluate our model. 
+Therefore, we use a mean top-N accuracy and MRR across the 10 folds in Section~\ref{results}.
+ 
+%We use \textbf{10-fold cross-validation} to estimate the efficacy of our models. All the passes in the dataset are randomly partitioned into 10 sets of roughly equal size. One subset is used as testing set (i.e., the held-out set) and the other nine subsets are used as training set. 
+%We train our models using the training set and evaluate the performance of our models on the held-out set.
+%The process repeats 10 times until all subsets are used as testing set once.
+
+\subsection{Feature importance}
+
+In order to understand the importance of the features in our model, we use the feature importance scores that are automatically provided by a trained LightGBM model.
+Gradient boosting decision trees (e.g., LightGBM) provide a straightforward way to retrieve the importance scores of each feature~\cite{friedman2001elements}.
+
+%After the boosting decision trees are constructed, the importance of a feature is calculated by accumulating all the split gains (i.e., Gini index) that the feature has contributed to the model.
+After the boosting decision trees are constructed, for each decision tree, the importance of a feature is calculated by the amount that the feature improves the performance measure at its split point (i.e., split gains). The importance of each feature is then accumulated across all of the decisions trees in the model.
+
