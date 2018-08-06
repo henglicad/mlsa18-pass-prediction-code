@@ -51,10 +51,20 @@ Then, we build three models with these three set of hyper-parameters using the t
 We apply these three models on the testing data and get three sets of results.
 We then average the results for each receiver candidate and use the averaged results to rank the receiver candidates. We find that with such an ensemble modeling approach, the accuracy of our model improves up to 2\%.% \todo{shall we use relative improvement?}.
 
-
-
 %For each fold, we hold out 10\% of the data as test set. 
 %For the first fold, we continue to split the data into training and validation data, then we do a grid search to get the top three set of parameters according to the validation set performance. Then for each fold, we train three models with these three set of hyperparameters \todo{list all the hyperparameters} on the training data. On test data, we use the three models to predict to get three sets of result, and then average the prediction results for each candidate, then use the averaged result to do ranking. We find that with model ensembling, all the accuracy numbers improve about 0.1\%\~2.0\%.
+
+\subsection{Baseline models}\label{baseline-models}
+
+In order to evaluate the performance of our LightGBM ranking model, we compare it with several baseline models.
+As discussed in Section~\ref{sec:data-exploration}, 75\% of the passes are within 20 meters (i.e., short passes), and 62\% of the passes are forward passes.
+Therefore, we derive baseline models that tend to select the nearest teammates and the teammates in the forward direction as the receiver.
+
+\begin{itemize}
+	\item \textbf{The RandomGuess model} selects the receiver of a pass by a random guess. It randomly ranks the candidate receivers.
+	\item \textbf{The NearestPass model} selects the nearest teammate of the sender as the top candidate receiver. It ranks the candidate receivers by their distance to the sender, from the teammates of the sender to the the opponents, and then from the closest to the furthest.
+	\item \textbf{The NearestForwardPass model} selects the nearest teammate of the sender that is in the forward direction (relative to the sender) as the top candidate receiver. It ranks the candidate receivers by their relative position to the sender, from the teammates of the sender to the opponents, then from the players in the forward direction to the players in the backward direction, and finally from the closest to the furthest.
+\end{itemize}
 
 \subsection{Evaluation approaches}\label{evaluation-approach}
 

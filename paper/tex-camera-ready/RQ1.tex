@@ -29,10 +29,10 @@ The MRR value for all passes is 0.68, which means on average, the correct receiv
 \caption{Comparing the accuracy of our model with baseline models (excluding false passes).}
 \centering
 \renewcommand{\tabcolsep}{3pt}
-\begin{threeparttable}
+%\begin{threeparttable}
 \begin{tabular}{lcccc}
   \toprule
-  & LightGBM & Random Guess\tnote{1} & NearestPass\tnote{2} & PassForwards\tnote{3} \\
+  & LightGBM & RandomGuess & NearestPass & NearestForwardPass \\
   \midrule
   Top-1 accuracy & \textbf{50\%} & 10\% & 33\% & 27\% \\
   Top-3 accuracy & \textbf{84\%} & 30\% & 70\% & 54\% \\
@@ -40,12 +40,12 @@ The MRR value for all passes is 0.68, which means on average, the correct receiv
   MRR & \textbf{0.68} & 0.29 & 0.55 & 0.47 \\
   \bottomrule
 \end{tabular}
-\begin{tablenotes}
-\item[1] Randomly guess a candidate receiver.
-\item[2] A model that always passes the ball to the nearest teammate of the sender.
-\item[3] A model that always passes the ball to the nearest teammate that is in the forward direction relative to the sender.
-\end{tablenotes}
-\end{threeparttable}
+%\begin{tablenotes}
+%\item[1] Randomly guess a candidate receiver.
+%\item[2] A model that always passes the ball to the nearest teammate of the sender.
+%\item[3] A model that always passes the ball to the nearest teammate that is in the forward direction relative to the sender.
+%\end{tablenotes}
+%\end{threeparttable}
 \label{tab:comparing-performance-accurate-passes}
 %\vspace{-0.4cm}
 \end{table}
@@ -83,7 +83,7 @@ The MRR value for all passes is 0.58, which means the correct receiver is averag
 %\begin{threeparttable}
 \begin{tabular}{lcccc}
   \toprule
-  & LightGBM & Random Guess & NearestPass & PassForwards \\
+  & LightGBM & RandomGuess & NearestPass & NearestForwardPass \\
   \midrule
   Top-1 accuracy & \textbf{41\%} & 5\% & 27\% & 23\% \\
   Top-3 accuracy & \textbf{70\%} & 14\% & 58\% & 45\% \\
@@ -104,6 +104,12 @@ The MRR value for all passes is 0.58, which means the correct receiver is averag
 \textbf{Our model performs better for back-field and front-field passes, while performing worse for middle-field passes.}
 Table~\ref{tab:performance-accurate-passes} and Table~\ref{tab:performance-all-passes} also shows the performance of our model for back-field, middle-field and front-field passes, separately.
 Surprisingly, the performance of our model is the worst for middle-field passes. A player in the middle area may have more passing options, thereby increasing the difficulty to predict the right receivers.
+
+\textbf{Our model perform better than the baseline models.}
+Table~\ref{tab:comparing-performance-accurate-passes} and Table~\ref{tab:comparing-performance-all-passes} compare the performance of our LightGBM model with the RandomGuess, NearestPass, and NearestForwardsPass models which are described in Section~\ref{methodology}.
+Our LightGBM model consistently show much better performance than the three baseline models in terms of the top-N accuracy and MRR.
+The NearestPass model, which tends to pass the ball to the nearest teammates, achieve a better performance than the NearestForwardPass, which tends to pass the ball to the nearest teammates in the forward direction relative to the sender.
+Both of the NearestPass and NearestForwardPass baseline models achieve a much better performance than randomly guessing the receiver of a pass.
 
 %\vspace{-0.4cm}
 \hypobox{
