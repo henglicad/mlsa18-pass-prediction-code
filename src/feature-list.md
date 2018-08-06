@@ -71,64 +71,64 @@
 
 ## Feature Importance Output From LightGBM
 
-**Feature** | **Importance**
-:-- | :--
-receiver_closest_opponent_dist | 715
-norm_receiver_sender_x_diff | 660
-abs_y_diff | 653
-distance | 616
-receiver_closest_opponent_to_sender_dist | 602
-receiver_closest_3_opponents_dist | 558
-receiver_to_center_distance | 521
-receiver_closest_3_teammates_dist | 508
-sender_closest_opponent_dist | 498
-min_pass_angle | 467
-receiver_to_defense_gate_dist | 457
-min_opponent_dist_to_sender_receiver_line | 450
-sender_to_center_distance | 445
-receiver_closest_teammate_dist | 438
-receiver_to_offense_gate_dist | 421
-receiver_closest_teammate_to_sender_dist | 419
-sender_closest_3_teammates_dist | 409
-third_opponent_dist_to_sender_receiver_line | 377
-sender_closest_3_opponents_dist | 371
-sender_team_cloeset_dist_to_bottom_sideline | 366
-second_opponent_dist_to_sender_receiver_line | 356
-sender_team_closest_dist_to_top_sideline | 348
-time_start | 340
-receiver_to_offense_gate_dist_rank_relative_to_teammates | 328
-sender_to_offense_gate_dist | 320
-sender_team_median_dist_to_top_sideline | 317
-sender_closest_teammate_dist | 316
-sender_to_defense_gate_dist | 300
-sender_team_closest_dist_to_offense_goal_line | 276
-sender_team_median_dist_to_offense_goal_line | 254
-sender_team_closest_dist_to_defense_goal_line_exclude_goalie | 245
-receiver_to_offense_gate_dist_rank_relative_to_opponents | 238
-receiver_to_sender_dist_rank_among_teammates | 179
-receiver_to_top_sideline_dist_rank_relative_to_opponents | 166
-receiver_to_sender_dist_rank_among_opponents | 159
-receiver_to_top_sideline_dist_rank_relative_to_teammates | 157
-sender_to_offense_gate_dist_rank_relative_to_opponents | 143
-sender_to_offense_gate_dist_rank_relative_to_teammates | 127
-num_dangerous_opponents_along_passing_line | 103
-sender_to_top_sideline_dist_rank_relative_to_teammates | 101
-sender_to_top_sideline_dist_rank_relative_to_opponents | 89
-is_receiver_in_offense_direction_relative_to_sender | 47
-is_in_same_team | 34
-is_receiver_goal_keeper | 20
-is_sender_receiver_in_same_field | 19
-is_sender_goal_keeper | 17
-is_receiver_in_middle_field | 13
-is_receiver_in_center_circle | 10
-is_sender_in_middle_field | 8
-is_receiver_in_back_field | 6
-is_receiver_in_front_field | 6
-is_start_of_game | 3
-is_sender_in_front_field | 2
-is_sender_in_back_field | 2
+**Feature** | **Importance** | **Category** 
+:-- | :-- | :--
+receiver_closest_opponent_dist | 715 | Candidate Receiver Position Features
+norm_receiver_sender_x_diff | 660 | Candidate Receiver Position Features
+abs_y_diff | 653 | Candidate Receiver Position Features
+distance | 616 | Candidate Receiver Position Features
+receiver_closest_opponent_to_sender_dist | 602 | Candidate Receiver Position Features
+receiver_closest_3_opponents_dist | 558 | Candidate Receiver Position Features
+receiver_to_center_distance | 521 | Candidate Receiver Position Features
+receiver_closest_3_teammates_dist | 508 | Candidate Receiver Position Features
+sender_closest_opponent_dist | 498 | Sender Position Features
+min_pass_angle | 467 | Passing Path Features
+receiver_to_defense_gate_dist | 457 | Candidate Receiver Position Features
+min_opponent_dist_to_sender_receiver_line | 450 | Passing Path Features
+sender_to_center_distance | 445 | Sender Position Features
+receiver_closest_teammate_dist | 438 | Candidate Receiver Position Features
+receiver_to_offense_gate_dist | 421 | Candidate Receiver Position Features
+receiver_closest_teammate_to_sender_dist | 419 | Candidate Receiver Position Features
+sender_closest_3_teammates_dist | 409 | Sender Position Features
+third_opponent_dist_to_sender_receiver_line | 377 | Passing Path Features
+sender_closest_3_opponents_dist | 371 | Sender Position Features
+sender_team_cloeset_dist_to_bottom_sideline | 366 | Team Position Features
+second_opponent_dist_to_sender_receiver_line | 356 | Passing Path Features
+sender_team_closest_dist_to_top_sideline | 348 | Team Position Features
+time_start | 340 | Game State Features
+receiver_to_offense_gate_dist_rank_relative_to_teammates | 328 | Team Position Features
+sender_to_offense_gate_dist | 320 | Sender Position Features
+sender_team_median_dist_to_top_sideline | 317 | Team Position Features
+sender_closest_teammate_dist | 316 | Sender Position Features
+sender_to_defense_gate_dist | 300 | Sender Position Features
+sender_team_closest_dist_to_offense_goal_line | 276 | Team Position Features
+sender_team_median_dist_to_offense_goal_line | 254 | Team Position Features
+sender_team_closest_dist_to_defense_goal_line_exclude_goalie | 245 | Team Position Features
+receiver_to_offense_gate_dist_rank_relative_to_opponents | 238 | Team Position Features
+receiver_to_sender_dist_rank_among_teammates | 179 | Team Position Features
+receiver_to_top_sideline_dist_rank_relative_to_opponents | 166 | Team Position Features
+receiver_to_sender_dist_rank_among_opponents | 159 | Team Position Features
+receiver_to_top_sideline_dist_rank_relative_to_teammates | 157 | Team Position Features
+sender_to_offense_gate_dist_rank_relative_to_opponents | 143 | Team Position Features
+sender_to_offense_gate_dist_rank_relative_to_teammates | 127 | Team Position Features
+num_dangerous_opponents_along_passing_line | 103 | Passing Path Features
+sender_to_top_sideline_dist_rank_relative_to_teammates | 101 | Team Position Features
+sender_to_top_sideline_dist_rank_relative_to_opponents | 89 | Team Position Features
+is_receiver_in_offense_direction_relative_to_sender | 47 | Candidate Receiver Position Features
+is_in_same_team | 34 | Candidate Receiver Position Features
+is_receiver_goal_keeper | 20 | Candidate Receiver Position Features
+is_sender_receiver_in_same_field | 19 | Candidate Receiver Position Features
+is_sender_goal_keeper | 17 | Sender Position Features
+is_receiver_in_middle_field | 13 | Candidate Receiver Position Features
+is_receiver_in_center_circle | 10 | Candidate Receiver Position Features
+is_sender_in_middle_field | 8 | Sender Position Features
+is_receiver_in_back_field | 6 | Candidate Receiver Position Features
+is_receiver_in_front_field | 6 | Candidate Receiver Position Features
+is_start_of_game | 3 | Game State Features
+is_sender_in_front_field | 2 | Sender Position Features
+is_sender_in_back_field | 2 | Sender Position Features
 
-## Per Feature Training Accuracy
+## Per-Feature Model Accuracy
 
 **Feature** | **Top-1 test accuracy**
 :-- | :--
