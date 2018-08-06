@@ -2,9 +2,9 @@
 
 \textbf{The features that capture the candidate receivers' positions play the most important roles in explaining the receiver of a pass.}
 Table~\ref{tab:combined-feature-importance} shows the combined importance of each feature dimension in our model. The combined importance is a sum of the importance scores of all the individual features in a dimension.
-The features from the dimension of candidate receiver position, which capture a candidate receiver's position in the pitch and his/her position relative to the teammates and opponents, have the biggest combined importance score in our model.
+The features from the dimension of candidate receiver position, which capture a candidate receiver's position on the pitch and his/her position relative to the teammates and opponents, have the biggest combined importance score in our model.
 The team position features, which captures the overall position of the team in control of the ball, are the second important dimension in explaining the receiver of a pass.
-The third important feature dimension (i.e., sender position) captures the sender's position in the pitch and his/her position relative to the teammates and opponents.
+The third important feature dimension (i.e., sender position) captures the sender's position on the pitch and his/her position relative to the teammates and opponents.
 The passing path features, which captures the characteristics of a passing path (i.e., the path from the sender to a candidate receiver), also play a significant role in explaining the receiver of a pass.
 
 \begin{table}[!t]
@@ -33,7 +33,7 @@ A full list of our features' important scores is available online\footnotemark[\
 Among the top 10 important features, there are eight features from the candidate receiver position dimension. %, one from the sender position dimension, and one from the passing path dimension.
 %Among the top 20 important features, there are 12 features from the candidate receiver position dimension, four from the sender position dimension, three from the passing path dimension, and one from the team position dimension.
 All of the top six features are from the dimension of candidate receiver position, among which three features capture a candidate receiver's relative position to the sender, and the other three features capture a candidate receiver's relative position to the components.
-The other two features from the dimension of candidate receiver position capture a candidate receiver's position in the pitch and his/her relative position to the teammates, respectively.
+The other two features from the dimension of candidate receiver position capture a candidate receiver's position on the pitch and his/her relative position to the teammates, respectively.
 Among the top 10 important features, there are also one from the sender position dimension (i.e., the sender\_closest\_opponent\_dist feature), and one from the passing path dimension (i.e., the min\_pass\_angle feature).
 
 %\setlength{\tabcolsep}{3pt}
@@ -43,7 +43,7 @@ Among the top 10 important features, there are also one from the sender position
 \renewcommand{\tabcolsep}{3pt}
 \resizebox{1.0\textwidth}{!} {
 \begin{threeparttable}
-\begin{tabular}{llcp{6cm}}
+\begin{tabular}{llcp{6.2cm}}
   \toprule
   Dimension & Feature & Importance & Description \\
   \midrule
@@ -66,9 +66,10 @@ Among the top 10 important features, there are also one from the sender position
 \end{threeparttable}
 }
 \label{tab:top-10-feature}
-%\vspace{-0.4cm}
+\vspace{-0.4cm}
 \end{table}
 
+\vspace{-0.2cm}
 \hypobox{
-The features that capture the candidate receivers' positions play the most important roles in explaining the receiver of a pass.
+The features that capture the positions of the candidate receivers, in particular, relative to the sender and the opponents, play the most important roles in explaining the receiver of a pass.
 }
