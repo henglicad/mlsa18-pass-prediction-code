@@ -31,6 +31,13 @@
 
 \usepackage{booktabs} % For formal tables
 %\usepackage{url}
+\setlength{\tabcolsep}{6pt}
+
+% define a command for specialcell
+\newcommand{\specialcell}[2][c]{%
+	\begin{tabular}[#1]{@{}c@{}}#2\end{tabular}}
+
+\usepackage[flushleft]{threeparttable}
 
 \begin{document}
 %
