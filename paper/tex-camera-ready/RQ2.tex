@@ -30,7 +30,7 @@ The passing path features, which captures the characteristics of a passing path 
 Table~\ref{tab:top-10-feature} lists the top ten features that are most important in our model and their respective importance scores.
 A full list of our features' important scores is available online\footnotemark[\ref{feature-list}].
 %Our online feature list\footnotemark[\ref{feature-list}] shows each feature's importance score in our model.
-Among the top 10 important features, there are eight features from the candidate receiver position dimension. %, one from the sender position dimension, and one from the passing path dimension.
+Among the top 10 important features, there are eight features from the dimension of candidate receiver position. %, one from the sender position dimension, and one from the passing path dimension.
 %Among the top 20 important features, there are 12 features from the candidate receiver position dimension, four from the sender position dimension, three from the passing path dimension, and one from the team position dimension.
 All of the top six features are from the dimension of candidate receiver position, among which three features capture a candidate receiver's relative position to the sender, and the other three features capture a candidate receiver's relative position to the components.
 The other two features from the dimension of candidate receiver position capture a candidate receiver's position on the pitch and his/her relative position to the teammates, respectively.
@@ -47,16 +47,16 @@ Among the top 10 important features, there are also one from the sender position
   \toprule
   Dimension & Feature & Importance & Description \\
   \midrule
-  \specialcell{Receiver\\position\tnote{1}} & \specialcell{receiver\_closest\_\\opponent\_dist} & 715 &  The distance between the candidate receiver and his/her closest opponent \\
-  \specialcell{Receiver\\position} & \specialcell{norm\_receiver\_\\sender\_x\_diff} & 660 & Normalized x-axis difference between the candidate receiver and the sender \\
-  \specialcell{Receiver\\position} & abs\_y\_diff & 653 & The absolute value of the y-axis difference between the sender and the candidate receiver \\
-  \specialcell{Receiver\\position} & distance & 616 & The candidate receiver's distance to the sender \\
-  \specialcell{Receiver\\position} & \specialcell{receiver\_closest\_\\opponent\_to\_\\sender\_dist} & 602 & The distance between the sender and the candidate receiver's closest opponent \\
-  \specialcell{Receiver\\position} & \specialcell{receiver\_closest\_3\_\\opponents\_dist} & 558 & The average distance between the candidate receiver and his/her three closest opponents \\
-  \specialcell{Receiver\\position} & \specialcell{receiver\_to\_center\_\\distance} & 521 & The distance between the candidate receiver and the center of the pitch \\
-  \specialcell{Receiver\\position} & \specialcell{receiver\_closest\_3\_\\teammates\_dist} & 508 & The average distance between the candidate receiver and his/her three closest teammates \\
-  \specialcell{Sender\\position} & \specialcell{sender\_closest\_\\opponent\_dist} & 498 & The distance between sender and his/her closest opponent \\
-  \specialcell{Passing\\path} & min\_pass\_angle & 467 & Pass angles are the angles between the line from the sender to the candidate receiver (i.e., the pass line) and the lines from the sender to the opponents along the pass line. The min\_pass\_angle is the minimum pass angle for a pass line \\
+  \specialcell{Receiver\\position\tnote{1}} & \specialcell{receiver\_closest\_\\opponent\_dist} & 715 &  The distance between a candidate receiver and his/her closest opponent \\
+  \specialcell{Receiver\\position} & \specialcell{norm\_receiver\_\\sender\_x\_diff} & 660 & Normalized x-axis difference between a candidate receiver and the sender \\
+  \specialcell{Receiver\\position} & abs\_y\_diff & 653 & The absolute value of the y-axis difference between the sender and a candidate receiver \\
+  \specialcell{Receiver\\position} & distance & 616 & A candidate receiver's distance to the sender \\
+  \specialcell{Receiver\\position} & \specialcell{receiver\_closest\_\\opponent\_to\_\\sender\_dist} & 602 & The distance between the sender and a candidate receiver's closest opponent \\
+  \specialcell{Receiver\\position} & \specialcell{receiver\_closest\_3\_\\opponents\_dist} & 558 & The average distance between a candidate receiver and his/her three closest opponents \\
+  \specialcell{Receiver\\position} & \specialcell{receiver\_to\_center\_\\distance} & 521 & The distance between a candidate receiver and the center of the pitch \\
+  \specialcell{Receiver\\position} & \specialcell{receiver\_closest\_3\_\\teammates\_dist} & 508 & The average distance between a candidate receiver and his/her three closest teammates \\
+  \specialcell{Sender\\position} & \specialcell{sender\_closest\_\\opponent\_dist} & 498 & The distance between the sender and his/her closest opponent \\
+  \specialcell{Passing\\path} & min\_pass\_angle & 467 & Pass angles are the angles between the line from the sender to a candidate receiver (i.e., the pass line) and the lines from the sender to the opponents along the pass line. The min\_pass\_angle is the minimum pass angle for a pass line \\
  
   \bottomrule
 \end{tabular}
