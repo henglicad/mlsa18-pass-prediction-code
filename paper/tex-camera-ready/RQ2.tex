@@ -4,3 +4,21 @@
 Our online feature list\footnotemark[\ref{feature-list}] also shows each feature's importance score in our model.
 Among the top 10 important features, there are eight features from the candidate receiver position dimension, one from the sender position dimension, and one from the passing path dimension.
 Among the top 20 important features, there are 12 features from the candidate receiver position dimension, four from the sender position dimension, three from the passing path dimension, and one from the team position dimension.
+
+\begin{table}[!t]
+\caption{The combined importance of each feature dimension.}
+\centering
+\begin{tabular}{lc}
+  \toprule
+  Feature dimension & Combined feature importance \\
+  \midrule
+  Candidate receiver position & 6723 \\
+  Team position & 3493 \\
+  Sender position & 2688 \\
+  Passing path & 1753 \\
+  Game state & 343 \\
+  \bottomrule
+\end{tabular}
+\label{tab:combined-feature-importance}
+%\vspace{-0.4cm}
+\end{table}

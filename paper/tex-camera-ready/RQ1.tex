@@ -11,14 +11,14 @@ The MRR value for all passes is 0.68, which means on average, the correct receiv
 \caption{The accuracy of our model for predicting the receiver of a pass (excluding false passes).}
 \centering
 \begin{tabular}{lcccc}
-  \hline
+  \toprule
   & Back-field & Middle-field & Front-field & Overall \\
-  \hline
+  \midrule
   Top-1 accuracy & 53\% & 46\% & 55\% & 50\% \\
   Top-3 accuracy & 84\% & 81\% & 91\% & 84\% \\
   Top-5 accuracy & 93\% & 93\% & 97\% & 94\% \\
   MRR & 0.70 & 0.66 & 0.73 & 0.68 \\
-  \hline
+  \bottomrule
 \end{tabular}
 \label{tab:performance-accurate-passes}
 %\vspace{-0.4cm}
@@ -35,14 +35,14 @@ The MRR value for all passes is 0.58, which means the correct receiver is averag
 \caption{The accuracy of our model for predicting the receiver of a pass (considering all passes including passes to the other team).}
 \centering
 \begin{tabular}{lcccc}
-  \hline
+  \toprule
   & Back-field & Middle-field & Front-field & Overall \\
-  \hline
+  \midrule
   Top-1 accuracy & 45\% & 38\% & 43\% & 41\% \\
   Top-3 accuracy & 72\% & 68\% & 72\% & 70\% \\
   Top-5 accuracy & 82\% & 80\% & 83\% & 81\% \\
   MRR & 0.61 & 0.56 & 0.60 & 0.58 \\
-  \hline
+  \bottomrule
 \end{tabular}
 \label{tab:performance-all-passes}
 %\vspace{-0.4cm}
