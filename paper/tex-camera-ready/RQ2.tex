@@ -10,6 +10,7 @@ The passing path features, which captures the characteristics of a passing path 
 \begin{table}[!t]
 \caption{The combined importance of each feature dimension.}
 \centering
+\renewcommand{\tabcolsep}{3pt}
 \begin{tabular}{lc}
   \toprule
   Feature dimension & Combined feature importance \\
@@ -35,10 +36,11 @@ All of the top six features are from the dimension of candidate receiver positio
 The other two features from the dimension of candidate receiver position capture a candidate receiver's position in the pitch and his/her relative position to the teammates, respectively.
 Among the top 10 important features, there are also one from the sender position dimension (i.e., the sender\_closest\_opponent\_dist feature), and one from the passing path dimension (i.e., the min\_pass\_angle feature).
 
-\setlength{\tabcolsep}{3pt}
+%\setlength{\tabcolsep}{3pt}
 \begin{table}[!t]
 \caption{The ten most important features and their importance scores.}
 \centering
+\renewcommand{\tabcolsep}{3pt}
 \resizebox{1.0\textwidth}{!} {
 \begin{threeparttable}
 \begin{tabular}{llcp{6cm}}

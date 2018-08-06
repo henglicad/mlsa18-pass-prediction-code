@@ -6,10 +6,11 @@ The ``Back-field'', ``Middle-field'', ``Front-field'' and ``Overall'' columns sh
 A top-3 accuracy of 84\% for all passes means that the actual receiver of a pass has a 84\% chance to appear in our top-3 predicted candidates.
 The MRR value for all passes is 0.68, which means on average, the correct receiver is ranked $1.5$th (i.e., 1/0.68) out of 10 or less receiver candidates (i.e., all teammates of the sender).
 
-
+%\setlength{\tabcolsep}{3pt}
 \begin{table}[!t]
 \caption{The accuracy of our model for predicting the receiver of a pass (excluding false passes).}
 \centering
+\renewcommand{\tabcolsep}{3pt}
 \begin{tabular}{lcccc}
   \toprule
   & Back-field & Middle-field & Front-field & Overall \\
@@ -24,6 +25,31 @@ The MRR value for all passes is 0.68, which means on average, the correct receiv
 %\vspace{-0.4cm}
 \end{table}
 
+\begin{table}[!t]
+\caption{Comparing the accuracy of our model with baseline models (excluding false passes).}
+\centering
+\renewcommand{\tabcolsep}{3pt}
+\begin{threeparttable}
+\begin{tabular}{lcccc}
+  \toprule
+  & LightGBM & Random Guess\tnote{1} & NearestPass\tnote{2} & PassForwards\tnote{3} \\
+  \midrule
+  Top-1 accuracy & \textbf{50\%} & 10\% & 33\% & 14\% \\
+  Top-3 accuracy & \textbf{84\%} & 30\% & 70\% & 41\% \\
+  Top-5 accuracy & \textbf{94\%} & 50\% & 86\% & 64\% \\
+  MRR & \textbf{0.68} & 0.29 & 0.55 & 0.35 \\
+  \bottomrule
+\end{tabular}
+\begin{tablenotes}
+\item[1] Randomly guess a candidate receiver.
+\item[2] A model that always passes the ball to the nearest teammate of the sender.
+\item[3] A model that always passes the ball to the nearest teammate that is in the forward direction relative to the sender.
+\end{tablenotes}
+\end{threeparttable}
+\label{tab:comparing-performance-accurate-passes}
+%\vspace{-0.4cm}
+\end{table}
+
 \textbf{Our model can predict the receiver of a pass with a top-1, top-3 and top-5 accuracy of 41\%, 70\%, and 81\%, respectively, when we consider all passes.}
 Table~\ref{tab:performance-all-passes} shows the performance of our model when we consider all passes (including false passes). 
 The performance of our model decreases when we consider false passes (i.e., passes to the other team). 
@@ -35,6 +61,7 @@ The MRR value for all passes is 0.58, which means the correct receiver is averag
 %\vspace{-0.2cm}
 \caption{The accuracy of our model for predicting the receiver of a pass (considering all passes including passes to the other team).}
 \centering
+\renewcommand{\tabcolsep}{3pt}
 \begin{tabular}{lcccc}
   \toprule
   & Back-field & Middle-field & Front-field & Overall \\
@@ -46,6 +73,31 @@ The MRR value for all passes is 0.58, which means the correct receiver is averag
   \bottomrule
 \end{tabular}
 \label{tab:performance-all-passes}
+%\vspace{-0.4cm}
+\end{table}
+
+\begin{table}[!t]
+\caption{Comparing the accuracy of our model with baseline models (considering all passes including passes to the other team).}
+\centering
+\renewcommand{\tabcolsep}{3pt}
+%\begin{threeparttable}
+\begin{tabular}{lcccc}
+  \toprule
+  & LightGBM & Random Guess & NearestPass & PassForwards \\
+  \midrule
+  Top-1 accuracy & \textbf{41\%} & 5\% & 27\% & 11\% \\
+  Top-3 accuracy & \textbf{70\%} & 14\% & 58\% & 34\% \\
+  Top-5 accuracy & \textbf{81\%} & 24\% & 71\% & 53\% \\
+  MRR & \textbf{0.58} & 0.17 & 0.47 & 0.31 \\
+  \bottomrule
+\end{tabular}
+%\begin{tablenotes}
+%\item[1] Randomly guess a candidate receiver.
+%\item[2] A model that always passes the ball to the nearest teammate of the sender.
+%\item[3] A model that always passes the ball to the nearest teammate that is in the forward direction relative to the sender.
+%\end{tablenotes}
+%\end{threeparttable}
+\label{tab:comparing-performance-all-passes}
 %\vspace{-0.4cm}
 \end{table}
 
