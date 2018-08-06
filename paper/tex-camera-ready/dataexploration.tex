@@ -45,6 +45,8 @@ Min. & 1st Qu. & Median & 3rd Qu. & Max. \\
 
 \textbf{Players pass the ball forwards in 62\% of the passes, and the ratio of forward-passing decreases from the back field to the front field.} In the back field, players pass the ball forwards in 74\% of the passes, and the ratio decreases to 61\% and 50\% for middle-field passes and front-field passes, respectively.
 
+We pre-process the data as follows. For each line in the original pass data, we drop this line if the sender's coordinates are missing, but we don't drop it if only the receiver's coordinates are missing, because we can still learn from this pass which players are not good candidates to pass to. For each pass, we compute features between the sender and each candidate if the candidate's coordinate is present.
+
 %\vspace{-0.4cm}
 \hypobox{
 Players present different passing characteristics in different areas of the field. 
