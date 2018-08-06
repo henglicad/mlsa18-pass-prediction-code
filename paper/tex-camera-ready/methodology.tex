@@ -3,7 +3,9 @@ This section discusses our overall methodology, including our feature extraction
 
 \subsection{Feature extraction}
 
-From the dataset that contains information with 12,122 valid passes\footnotemark[\ref{origin_dataset}], we extract five dimensions of features to explain the likelihood of passing the ball to a certain receiver. In total, we extract 54 features. A full list of our features is available at our public github repository\footnote{\label{feature-list}https://github.com/henglicad/mlsa18-pass-prediction/blob/master/feature-list.md}. 
+%From the dataset that contains information with 12,122 valid passes\footnotemark[\ref{origin_dataset}], 
+From the dataset that we explain in Section~\ref{sec:data-exploration},
+we extract five dimensions of features to explain the likelihood of passing the ball to a certain receiver. In total, we extract 54 features. A full list of our features is available at our public github repository\footnote{\label{feature-list}https://github.com/henglicad/mlsa18-pass-prediction/blob/master/feature-list.md}. 
 We also share our extracted feature values online~\footnote{\label{feature-values}https://github.com/henglicad/mlsa18-pass-prediction/blob/master/features.tsv}.
 %Section~\ref{RQ3-results} discusses the most important features for explaining the receiver of a pass.
 \begin{itemize}
@@ -62,7 +64,7 @@ Therefore, we derive baseline models that tend to select the nearest teammates a
 
 \begin{itemize}
 	\item \textbf{The RandomGuess model} selects the receiver of a pass by a random guess. It randomly ranks the candidate receivers.
-	\item \textbf{The NearestPass model} selects the nearest teammate of the sender as the top candidate receiver. It ranks the candidate receivers by their distance to the sender, from the teammates of the sender to the the opponents, and then from the closest to the furthest.
+	\item \textbf{The NearestPass model} selects the nearest teammate of the sender as the top candidate receiver. It ranks the candidate receivers by their distance to the sender, from the teammates of the sender to the opponents, and then from the closest to the furthest.
 	\item \textbf{The NearestForwardPass model} selects the nearest teammate of the sender that is in the forward direction (relative to the sender) as the top candidate receiver. It ranks the candidate receivers by their relative position to the sender, from the teammates of the sender to the opponents, then from the players in the forward direction to the players in the backward direction, and finally from the closest to the furthest.
 \end{itemize}
 

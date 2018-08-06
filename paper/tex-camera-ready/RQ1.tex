@@ -106,12 +106,12 @@ Table~\ref{tab:performance-accurate-passes} and Table~\ref{tab:performance-all-p
 Surprisingly, the performance of our model is the worst for middle-field passes. A player in the middle area may have more passing options, thereby increasing the difficulty to predict the right receivers.
 
 \textbf{Our model perform better than the baseline models.}
-Table~\ref{tab:comparing-performance-accurate-passes} and Table~\ref{tab:comparing-performance-all-passes} compare the performance of our LightGBM model with the RandomGuess, NearestPass, and NearestForwardsPass models which are described in Section~\ref{methodology}.
+Table~\ref{tab:comparing-performance-accurate-passes} and Table~\ref{tab:comparing-performance-all-passes} compare the performance of our LightGBM model with the RandomGuess, NearestPass, and NearestForwardPass models which are described in Section~\ref{methodology}.
 Our LightGBM model consistently show much better performance than the three baseline models in terms of the top-N accuracy and MRR.
 The NearestPass model, which tends to pass the ball to the nearest teammates, achieve a better performance than the NearestForwardPass, which tends to pass the ball to the nearest teammates in the forward direction relative to the sender.
 Both of the NearestPass and NearestForwardPass baseline models achieve a much better performance than randomly guessing the receiver of a pass.
 
 %\vspace{-0.4cm}
 \hypobox{
-Our model can predict the receiver of a pass with a top-1, top-3 and top-5 accuracy of 50\%, 84\%, and 94\%, respectively, when we exclude false passes. Our model performs better when the sender of a pass is in the back or front area of the field.
+Our model can predict the receiver of a pass with a top-1, top-3 and top-5 accuracy of 50\%, 84\%, and 94\%, respectively, when we exclude false passes, outperforming three baseline models. Our model performs better when the sender of a pass is in the back or front area of the field.
 }
